@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<IsPackable>true</IsPackable>
+	<Authors>Alexgoon</Authors>
+	<PackageId>Ason.RemoteRunner</PackageId>
+	<Description>Run an ASON environment remotely and connect to it from a client.</Description>
+	<RepositoryUrl>https://github.com/Alexgoon/ason</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+	<ProjectReference Include="..\Ason.Runner\Ason.Runner.csproj" />
+  </ItemGroup>
+
+</Project>

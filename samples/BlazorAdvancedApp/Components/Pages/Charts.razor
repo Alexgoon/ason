@@ -1,0 +1,70 @@
+@page "/charts"
+@inject SessionState Session
+@implements IDisposable
+
+@if (!_loaded) {
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="ma-6" />
+}
+else {
+    <MudStack Style="height:100%;">
+        <MudText Typo="Typo.h5" GutterBottom="true">Charts</MudText>
+        @if (Series.Count == 0) {
+            <MudText Typo="Typo.subtitle1" Class="ma-4">Ask the agent to generate a chart from the app’s data</MudText>
+        }
+        else {
+            <MudChart ChartType="ChartType.Bar"
+                      ChartOptions="_chartOptions"
+                      ChartSeries="@Series"
+                      AxisChartOptions="@_axisChartOptions"
+                      XAxisLabels="@XAxisLabels"
+                      Width="100%"
+                      Height="100%"
+                      Style="flex:1; display:flex; padding:20px;" />
+        }
+    </MudStack>
+
+}
+
+@code {
+    bool _loaded;
+    string? _xAxisCaption;
+    string? _yAxisCaption;
+    public List<ChartSeries> Series = new();
+    public string[] XAxisLabels = Array.Empty<string>();
+
+    ChartOptions _chartOptions = new() {
+        ShowLegend = false,
+        ShowLabels = true,
+        ShowToolTips = true,
+        YAxisRequireZeroPoint = true
+    };
+    AxisChartOptions _axisChartOptions = new();
+
+    protected override async Task OnInitializedAsync() {
+        await Session.EnsureSeededAsync();
+
+        _loaded = true;
+        Session.MainAppOperator.AttachChildOperator<ChartsOperator>(this);
+    }
+
+    public void AddBarChart(BarValue[] barValues, string xAxisCaption, string yAxisCaption) {
+        if (barValues is null || barValues.Length == 0) {
+            Session.ChartLabels.Clear();
+            Session.ChartValues.Clear();
+            _xAxisCaption = _yAxisCaption = null;
+            StateHasChanged();
+            return;
+        }
+
+        Series = new List<ChartSeries> { new ChartSeries { Name = "Series 1", Data = barValues.Select(bv => bv.Value).ToArray() } };
+        XAxisLabels = barValues.Select(bv => bv.Caption ?? string.Empty).ToArray();
+
+        _xAxisCaption = xAxisCaption;
+        _yAxisCaption = yAxisCaption;
+
+        StateHasChanged();
+    }
+    public void Dispose() {
+        Session.MainAppOperator.DetachChildOperator<ChartsOperator>();
+    }
+}

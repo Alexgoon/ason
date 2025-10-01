@@ -1,0 +1,57 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: Alexgoon
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}   # убираем "v"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build & Pack Ason
+        run: |
+          dotnet build src/Ason/Ason.csproj --configuration Release
+          dotnet pack src/Ason/Ason.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Build & Pack Ason.Runner
+        run: |
+          dotnet build src/Ason.Runner/Ason.Runner.csproj --configuration Release
+          dotnet pack src/Ason.Runner/Ason.Runner.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Build & Pack Ason.RemoteRunner
+        run: |
+          dotnet build src/Ason.RemoteRunner/Ason.RemoteRunner.csproj --configuration Release
+          dotnet pack src/Ason.RemoteRunner/Ason.RemoteRunner.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Show built packages
+        run: ls -l ./nupkg
+
+      - name: Publish NuGet packages
+        run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

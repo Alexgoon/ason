@@ -1,0 +1,6 @@
+@RunnerServiceSample_HostAddress = http://localhost:5236
+
+GET {{RunnerServiceSample_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
