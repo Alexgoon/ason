@@ -2,7 +2,7 @@ using Ason;
 
 namespace BlazorAdvancedApp.Models;
 
-[ProxyModel]
+[AsonModel]
 public class Employee {
     public int Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ public class Employee {
     public List<Sale> Sales { get; set; } = new();
 }
 
-[ProxyModel]
+[AsonModel]
 public class Sale {
     public int Id { get; set; }
     public string ProductName { get; set; } = string.Empty;
@@ -22,7 +22,7 @@ public class Sale {
     public DateTime SaleDate { get; set; }
 }
 
-[ProxyModel]
+[AsonModel]
 public class Appointment {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -31,7 +31,7 @@ public class Appointment {
     public DateTime EndTime { get; set; }
 }
 
-[ProxyModel]
+[AsonModel]
 public class MailItem {
     public string Subject { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;

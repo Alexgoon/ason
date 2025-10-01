@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WpfSampleApp.Model;
 
-[ProxyModel]
+[AsonModel]
 public class Appointment
 {
     public int Id { get; set; }

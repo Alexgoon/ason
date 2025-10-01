@@ -58,7 +58,7 @@ public sealed class OperatorBuilder {
         foreach (var asm in assemblies) {
             Type[] types; try { types = asm.GetTypes(); } catch { continue; }
             foreach (var t in types) {
-                if (!Attribute.IsDefined(t, typeof(ProxyClassAttribute)) && !typeof(OperatorBase).IsAssignableFrom(t)) continue;
+                if (!Attribute.IsDefined(t, typeof(AsonClassAttribute)) && !typeof(OperatorBase).IsAssignableFrom(t)) continue;
                 if (t.FullName == typeof(ExtractionOperator).FullName && !_addExtractor) continue;
                 var methods = t.GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);
                 foreach (var m in methods) {

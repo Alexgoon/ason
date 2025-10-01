@@ -5,7 +5,7 @@ using WpfSampleApp.Views;
 
 namespace WpfSampleApp.AI;
 
-[ProxyClass(description: "Manages main navigation")]
+[AsonClass(description: "Manages main navigation")]
 public class MainAppOperator : RootOperator<MainViewModel> {
     public MainAppOperator(MainViewModel associatedObject) : base(associatedObject) { }
 
@@ -34,7 +34,7 @@ public class MainAppOperator : RootOperator<MainViewModel> {
     }
 }
 
-[ProxyClass(description: "Manages Employees view")]
+[AsonClass(description: "Manages Employees view")]
 public class EmployeesViewOperator : OperatorBase<EmployeesViewModel> {
 
     [ProxyMethod]
@@ -54,7 +54,7 @@ public class EmployeesViewOperator : OperatorBase<EmployeesViewModel> {
     }
 }
 
-[ProxyClass("Manages employee update/editing operations")]
+[AsonClass("Manages employee update/editing operations")]
 public class EmployeeEditViewOperator : OperatorBase<EmployeeEditViewModel> {
 
     [ProxyMethod]
@@ -64,7 +64,7 @@ public class EmployeeEditViewOperator : OperatorBase<EmployeeEditViewModel> {
     }
 }
 
-[ProxyClass("Allows to create/draw charts")]
+[AsonClass("Allows to create/draw charts")]
 public class ChartsViewOperator : OperatorBase<ChartsView> {
 
     [ProxyMethod("Initializes bar chart and assigns data displayed in chart")]

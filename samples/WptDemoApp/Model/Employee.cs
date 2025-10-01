@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WpfSampleApp.Model;
 
-[ProxyModel]
+[AsonModel]
 public class Employee {
     public int Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
@@ -18,7 +18,7 @@ public class Employee {
     public List<Sale> Sales { get; set; } = new();
 }
 
-[ProxyModel]
+[AsonModel]
 public class Sale {
     public int Id { get; set; }
     public string ProductName { get; set; } = string.Empty;

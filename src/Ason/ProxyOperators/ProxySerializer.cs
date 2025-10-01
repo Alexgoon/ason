@@ -75,7 +75,7 @@ public static class ProxySerializer {
 
     #region Model Generation
     private static void AppendModelDtos(StringBuilder sb, Assembly[] assemblies) {
-        var modelTypes = GetTypesWithAttribute<ProxyModelAttribute>(assemblies).Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.Name).ToArray();
+        var modelTypes = GetTypesWithAttribute<AsonModelAttribute>(assemblies).Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.Name).ToArray();
         foreach (var t in modelTypes) {
             sb.AppendLine($"public class {t.Name} {{");
             foreach (var p in t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite).OrderBy(p => p.Name)) {
@@ -85,9 +85,9 @@ public static class ProxySerializer {
         }
     }
     private static void AppendModelDtosSignatures(StringBuilder sb, Assembly[] assemblies) {
-        var modelTypes = GetTypesWithAttribute<ProxyModelAttribute>(assemblies).Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.Name).ToArray();
+        var modelTypes = GetTypesWithAttribute<AsonModelAttribute>(assemblies).Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.Name).ToArray();
         foreach (var t in modelTypes) {
-            var attr = t.GetCustomAttribute<ProxyModelAttribute>();
+            var attr = t.GetCustomAttribute<AsonModelAttribute>();
             if (!string.IsNullOrWhiteSpace(attr?.Description)) foreach (var line in SplitLines(attr.Description!)) sb.AppendLine($"// {line}");
             sb.AppendLine($"public class {t.Name} {{");
             foreach (var p in t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite).OrderBy(p => p.Name)) {
@@ -100,7 +100,7 @@ public static class ProxySerializer {
 
     #region Proxy Generation (Runtime)
     private static void AppendDynamicProxies(StringBuilder sb, Assembly[] assemblies) {
-        var proxyTypes = GetTypesWithAttribute<ProxyClassAttribute>(assemblies)
+        var proxyTypes = GetTypesWithAttribute<AsonClassAttribute>(assemblies)
             .Where(t => !IsExcludedBase(t))
             .OrderBy(t => t.Name).ToArray();
         foreach (var t in proxyTypes) {
@@ -153,7 +153,7 @@ public static class ProxySerializer {
         }
         else if (rt.IsGenericType && rt.GetGenericTypeDefinition() == typeof(Task<>)) {
             var tArg = rt.GetGenericArguments()[0];
-            bool isOp = tArg.GetCustomAttribute<ProxyClassAttribute>() != null;
+            bool isOp = tArg.GetCustomAttribute<AsonClassAttribute>() != null;
             if (isOp) {
                 sb.AppendLine($"    public {tArg.Name} {logicalName}({paramSig}) {{ var handle = ProxyRuntime.Host.InvokeAsync<string>(\"{target}\", \"{rawName}\", {argsPack}{(isInstance ? ", _handle" : string.Empty)}).GetAwaiter().GetResult(); return new {tArg.Name}(handle); }}");
             } else {
@@ -170,7 +170,7 @@ public static class ProxySerializer {
 
     #region Proxy Generation (Signatures)
     private static void AppendSignatureProxies(StringBuilder sb, Assembly[] assemblies) {
-        var proxyTypes = GetTypesWithAttribute<ProxyClassAttribute>(assemblies)
+        var proxyTypes = GetTypesWithAttribute<AsonClassAttribute>(assemblies)
             .Where(t => !IsExcludedBase(t))
             .OrderBy(t => t.Name).ToArray();
         foreach (var t in proxyTypes) {
@@ -180,7 +180,7 @@ public static class ProxySerializer {
     }
 
     private static void AppendStaticSignatureProxy(StringBuilder sb, Type type) {
-        var attr = type.GetCustomAttribute<ProxyClassAttribute>();
+        var attr = type.GetCustomAttribute<AsonClassAttribute>();
         if (!string.IsNullOrWhiteSpace(attr?.Description)) foreach (var line in SplitLines(attr.Description!)) sb.AppendLine($"// {line}");
         sb.AppendLine($"public static class {type.Name} {{");
         foreach (var mi in type.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m=>m.GetCustomAttribute<ProxyMethodAttribute>()!=null).OrderBy(m=>m.Name))
@@ -189,7 +189,7 @@ public static class ProxySerializer {
     }
 
     private static void AppendInstanceSignatureProxy(StringBuilder sb, Type type) {
-        var attr = type.GetCustomAttribute<ProxyClassAttribute>();
+        var attr = type.GetCustomAttribute<AsonClassAttribute>();
         if (!string.IsNullOrWhiteSpace(attr?.Description)) foreach (var line in SplitLines(attr.Description!)) sb.AppendLine($"// {line}");
         sb.AppendLine($"public class {type.Name} {{");
         sb.AppendLine($"    private {type.Name}();"); // discourage direct instantiation
@@ -232,7 +232,7 @@ public static class ProxySerializer {
         if (rt == typeof(void) || rt == typeof(Task)) return "void";
         if (rt.IsGenericType && rt.GetGenericTypeDefinition() == typeof(Task<>)) {
             var tArg = rt.GetGenericArguments()[0];
-            if (tArg.GetCustomAttribute<ProxyClassAttribute>() != null) return tArg.Name;
+            if (tArg.GetCustomAttribute<AsonClassAttribute>() != null) return tArg.Name;
             return GetFriendlyTypeName(tArg);
         }
         return GetFriendlyTypeName(rt);

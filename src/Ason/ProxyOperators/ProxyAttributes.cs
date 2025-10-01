@@ -11,11 +11,11 @@ public abstract class ProxyAttributeBase : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-public sealed class ProxyClassAttribute : ProxyAttributeBase
+public sealed class AsonClassAttribute : ProxyAttributeBase
 {
     // Optional override for the target name used over the wire (defaults to type name)
     public string? TargetName { get; }
-    public ProxyClassAttribute(string? targetName = null, string? description = null) : base(description)
+    public AsonClassAttribute(string? targetName = null, string? description = null) : base(description)
     {
         TargetName = targetName;
     }
@@ -30,9 +30,9 @@ public sealed class ProxyMethodAttribute : ProxyAttributeBase
 }
 
 [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-public sealed class ProxyModelAttribute : ProxyAttributeBase
+public sealed class AsonModelAttribute : ProxyAttributeBase
 {
-    public ProxyModelAttribute(string? description = null) : base(description)
+    public AsonModelAttribute(string? description = null) : base(description)
     {
     }
 }

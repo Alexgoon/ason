@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Ason.Tests.Runner;
 
 public class RunnerClientInProcessTests {
-    [ProxyClass]
+    [AsonClass]
     private sealed class SimpleOp : OperatorBase {
         public SimpleOp() { }
         [ProxyMethod] public int Add(int a, int b) => a + b;

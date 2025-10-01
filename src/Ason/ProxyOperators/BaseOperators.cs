@@ -2,7 +2,7 @@
 
 namespace Ason;
 
-[ProxyClass]
+[AsonClass]
 public class OperatorBase {
     Action? OpenViewAction;
     RootOperator? rootOperator;

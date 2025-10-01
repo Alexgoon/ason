@@ -74,7 +74,7 @@ public partial class ChartsView : UserControl {
     }
 }
 
-[ProxyModel("ALWAYS convert Value to double explicitly")]
+[AsonModel("ALWAYS convert Value to double explicitly")]
 public class BarValue {
     public string Caption { get; set; } = string.Empty;
     public double Value { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WpfSampleApp.Model;
 
-[ProxyModel]
+[AsonModel]
 public class MailItem {
     public string Subject { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
