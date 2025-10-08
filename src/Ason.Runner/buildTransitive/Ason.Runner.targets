@@ -1,0 +1,18 @@
+<Project>
+  <!-- Copies Ason.Runner host manifest files into the consuming project's output so Ason.Runner.dll is a runnable host -->
+  <PropertyGroup>
+    <!-- Directory inside the installed NuGet package where these files reside -->
+    <_AsonRunnerPackageDir>$(MSBuildThisFileDirectory)</_AsonRunnerPackageDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Collect files if they exist (package contains them) -->
+    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.Runner.runtimeconfig.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.Runner.runtimeconfig.json')" />
+    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.Runner.deps.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.Runner.deps.json')" />
+  </ItemGroup>
+
+  <!-- After build copy into output path (bin/Debug|Release/TFM/) -->
+  <Target Name="CopyAsonRunnerHostManifests" AfterTargets="Build">
+    <Copy SourceFiles="@(_AsonRunnerHostFile)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="@( _AsonRunnerHostFile ) != ''" />
+  </Target>
+</Project>

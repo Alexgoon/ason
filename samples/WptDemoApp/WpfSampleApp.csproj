@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	<XamlDebuggingInformation>True</XamlDebuggingInformation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appIcon.png" />
+    <None Remove="Images\send.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\appIcon.png" />
+    <Resource Include="Images\send.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="ScottPlot.WPF" Version="5.0.56" />
+    <PackageReference Include="ModelContextProtocol.Core" Version="0.1.0-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ason\Ason.csproj" />
+  </ItemGroup>
+
+</Project>

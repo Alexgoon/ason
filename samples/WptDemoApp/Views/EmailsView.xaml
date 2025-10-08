@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="WpfSampleApp.Views.EmailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WpfSampleApp.Views"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <CollectionViewSource x:Key="EmailsViewSource" Source="{Binding Emails}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="ReceivedDate" Direction="Descending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <DataTemplate x:Key="emamilTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding From}" 
+                           FontSize="14"/>
+                <TextBlock Text="{Binding Subject}"
+                           TextTrimming="WordEllipsis"
+                           Grid.Row="1" 
+                           FontSize="12"/>
+                <TextBlock Text="{Binding Body}"
+                           TextTrimming="WordEllipsis"
+                           MaxHeight="20"
+                           Grid.Row="2" />
+                <TextBlock Text="{Binding ReceivedDate, StringFormat='{}{0:ddd, MMM d}'}"
+                           HorizontalAlignment="Right"
+                           FontSize="12"
+                           Grid.Column="1"
+                           Grid.Row="1" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadDataCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <ListBox ItemsSource="{Binding Source={StaticResource EmailsViewSource}}"
+                 SelectedItem="{Binding SelectedEmail}"
+                 ItemTemplate="{StaticResource emamilTemplate}"
+                 HorizontalContentAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 Padding="8"
+                 Background="White"
+                 Margin="0,0,8,0"
+                 Grid.RowSpan="2" />
+        <ProgressBar IsIndeterminate="True"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     Visibility="{Binding LoadDataCommand.IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     Margin="40,0"
+                     Grid.RowSpan="2" />
+        <TextBox Text="{Binding SelectedEmail.Subject}"
+                 IsReadOnly="True"
+                 BorderThickness="0"
+                 FontWeight="Bold"
+                 FontSize="16"
+                 Margin="0,0,0,8"
+                 Grid.Column="1" />
+        <TextBox Text="{Binding SelectedEmail.Body}"
+                 AcceptsReturn="True"
+                 IsReadOnly="True"
+                 TextWrapping="Wrap"
+                 BorderThickness="0"
+                 Grid.Column="1"
+                 Grid.Row="1" />
+    </Grid>
+</UserControl>

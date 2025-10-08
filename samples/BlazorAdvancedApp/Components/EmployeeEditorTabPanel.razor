@@ -1,0 +1,79 @@
+@using BlazorAdvancedApp.Models
+@using MudBlazor
+@inject SessionState Session
+@implements IDisposable
+
+<MudPaper Class="pa-4 d-flex flex-column h-100" Elevation="0">
+    <MudGrid Class="flex-grow-1 overflow-auto">
+        <MudItem xs="12" md="5">
+            <MudCard>
+                <MudCardHeader><MudText Typo="Typo.subtitle1">Employee Info</MudText></MudCardHeader>
+                <MudCardContent>
+                    <MudTextField @bind-Value="Model.Editable.FirstName" Label="First Name" Immediate="true" />
+                    <MudTextField @bind-Value="Model.Editable.LastName" Label="Last Name" Immediate="true" />
+                    <MudTextField @bind-Value="Model.Editable.Email" Label="Email" Immediate="true" />
+                    <MudTextField @bind-Value="Model.Editable.Position" Label="Position" Immediate="true" />
+                    <MudDatePicker Value="Model.Editable.HireDate" ValueChanged="(d)=> Model.Editable.HireDate = d" Label="Hire Date" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" md="7">
+            <MudCard Class="h-100 d-flex flex-column">
+                <MudCardHeader>
+                    <MudText Typo="Typo.subtitle1">Sales</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddSale" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Disabled="Model.SelectedSale is null" OnClick="DeleteSale" />
+                </MudCardHeader>
+                <MudCardContent Class="flex-grow-1 overflow-auto">
+                    <MudDataGrid T="Sale" Items="Model.Editable.Sales" Dense="true" Hover="true" RowsPerPage="5"
+                                 SelectedItemChanged="(s) => Model.SelectedSale = s">
+                        <Columns>
+                            <PropertyColumn T="Sale" TProperty="string" Property="s => s.ProductName" Title="Product" Editable="true" />
+                            <PropertyColumn T="Sale" TProperty="int" Property="s => s.Quantity" Title="Qty" Editable="true" />
+                            <PropertyColumn T="Sale" TProperty="decimal" Property="s => s.Price" Title="Price" Editable="true" />
+                            <TemplateColumn T="Sale" Title="Sale Date">
+                                <CellTemplate Context="sale">@sale.Item.SaleDate.ToShortDateString()</CellTemplate>
+                                <EditTemplate Context="sale">
+                                    <MudDatePicker Value="sale.Item.SaleDate" ValueChanged="(d)=> sale.Item.SaleDate = d" />
+                                </EditTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+    <MudStack Row="true" Spacing="2" Class="mt-4 justify-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => OnSave?.Invoke(Model)">Save</MudButton>
+        <MudButton Variant="Variant.Outlined" OnClick="() => OnClose?.Invoke(Model)">Cancel</MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public EmployeeEditModel Model { get; set; } = default!;
+    [Parameter] public Action<EmployeeEditModel>? OnSave { get; set; }
+    [Parameter] public Action<EmployeeEditModel>? OnClose { get; set; }
+
+    void AddSale() {
+        int nextId = Model.Editable.Sales.Any() ? Model.Editable.Sales.Max(s => s.Id) + 1 : 1;
+        Model.Editable.Sales.Add(new Sale { Id = nextId, ProductName = "Product", Quantity = 1, Price = 100, SaleDate = DateTime.Today });
+    }
+    void DeleteSale() {
+        if (Model.SelectedSale is null) return; Model.Editable.Sales.Remove(Model.SelectedSale); Model.SelectedSale = null;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Model.StateChanged += OnStateHasChanged;  
+    } 
+
+    void OnStateHasChanged() {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() {
+        Model.StateChanged -= StateHasChanged;
+    }
+}
