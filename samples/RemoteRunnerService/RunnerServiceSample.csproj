@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Ason.RemoteRunner\Ason.RemoteBridge.csproj" />
+    <ProjectReference Include="..\..\src\Ason.RemoteBridge\Ason.RemoteBridge.csproj" />
   </ItemGroup>
 
 </Project>
