@@ -24,19 +24,15 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
 	</ItemGroup>
 
-	<!-- Ensure runtimeconfig/deps land next to consumer output -->
+	<!-- Package host manifest files (runtimeconfig/deps) into buildTransitive so they are not added to the consumer project tree, but available for our targets to copy next to the consuming output -->
 	<ItemGroup>
 		<Content Include="$(OutputPath)$(AssemblyName).runtimeconfig.json">
 			<Pack>true</Pack>
-			<PackagePath>contentFiles/any/any/</PackagePath>
-			<PackageCopyToOutput>true</PackageCopyToOutput>
-			<PackageFlatten>true</PackageFlatten>
+			<PackagePath>buildTransitive/</PackagePath>
 		</Content>
 		<Content Include="$(OutputPath)$(AssemblyName).deps.json">
 			<Pack>true</Pack>
-			<PackagePath>contentFiles/any/any/</PackagePath>
-			<PackageCopyToOutput>true</PackageCopyToOutput>
-			<PackageFlatten>true</PackageFlatten>
+			<PackagePath>buildTransitive/</PackagePath>
 		</Content>
 	</ItemGroup>
 
