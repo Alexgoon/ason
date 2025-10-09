@@ -1,5 +1,5 @@
 <Project>
-  <!-- Copies Ason.Runner host manifest files into the consuming project's output so Ason.Runner.dll is a runnable host -->
+  <!-- Copies Ason.ExternalExecutor host manifest files into the consuming project's output so Ason.ExternalExecutor.dll is a runnable host -->
   <PropertyGroup>
     <!-- Directory inside the installed NuGet package where these files reside -->
     <_AsonRunnerPackageDir>$(MSBuildThisFileDirectory)</_AsonRunnerPackageDir>
@@ -7,8 +7,8 @@
 
   <ItemGroup>
     <!-- Collect files if they exist (package contains them) -->
-    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.Runner.runtimeconfig.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.Runner.runtimeconfig.json')" />
-    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.Runner.deps.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.Runner.deps.json')" />
+    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.ExternalExecutor.runtimeconfig.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.ExternalExecutor.runtimeconfig.json')" />
+    <_AsonRunnerHostFile Include="$(_AsonRunnerPackageDir)Ason.ExternalExecutor.deps.json" Condition="Exists('$(_AsonRunnerPackageDir)Ason.ExternalExecutor.deps.json')" />
   </ItemGroup>
 
   <!-- After build copy into output path (bin/Debug|Release/TFM/) -->
