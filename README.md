@@ -49,7 +49,7 @@ Here’s a simplified overview of the ASON architecture:
 4. The **execution environment** calls dynamically generated proxies that invoke real operator methods.
 
 
-### Operators
+## Operators
 
 An **operator** is a class that contains methods exposed to the Script Agent.  
 To define an operator, create a class that inherits from `OperatorBase`.  
@@ -121,7 +121,7 @@ When the associated object is destroyed, call `DetachChildOperator`.
 
 ---
 
-## Models
+## Domain model
 
 ASON allows you to expose models as part of the API used by the Script Agent.  
 To add a model to your API, apply the `[AsonModel]` attribute to a class.
@@ -347,7 +347,6 @@ leadsOperator.GetLeads()
  
 ASON understands your model (for example, `Lead`) and available operations (such as `GetLeads` and `UpdateLead`), allowing the AI to compose flexible logic on the fly.
 
----
 
 ### Performance
 
@@ -371,7 +370,7 @@ It can, for instance, obtain a list of recent orders and delete them all in one 
 
 This reduces network latency and token usage while improving throughput for large-scale operations.
 
----
+![ASON Performance Benefits](images/ason-performance.png)
 
 ### Token usage and API capacity
 
