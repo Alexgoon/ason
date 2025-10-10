@@ -58,7 +58,7 @@ public class AsonClientOrchestrationTests {
     private AsonClient CreateClient(IChatCompletionService svc, AsonClientOptions opts) {
         var root = new RootOperator(new object());
         var client = new AsonClient(svc, root, Snapshot, new AsonClientOptions {
-            SkipAnswerAgent = opts.SkipAnswerAgent,
+            SkipReceptionAgent = opts.SkipReceptionAgent,
             SkipExplainerAgent = opts.SkipExplainerAgent,
             MaxFixAttempts = opts.MaxFixAttempts,
             ExecutionMode = ExecutionMode.InProcess
@@ -69,7 +69,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Route_DirectAnswer_Path() {
         var svc = new FixedChatService("Plain answer");
-        var opts = new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true };
+        var opts = new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true };
         var client = CreateClient(svc, opts);
         var result = await client.SendAsync("What is test?");
         Assert.Contains("Plain answer", result);
@@ -78,7 +78,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Route_Script_Path_With_Explanation() {
         var svc = new FixedChatService("script", "return 1;", "Explained result");
-        var opts = new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = false };
+        var opts = new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = false };
         var client = CreateClient(svc, opts);
         var reply = await client.SendAsync("Compute something");
         Assert.Contains("Explained", reply);
@@ -87,7 +87,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Route_Script_Path_When_SkipAnswerAgent() {
         var svc = new FixedChatService("return 2;","Explained 2");
-        var opts = new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false };
+        var opts = new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false };
         var client = CreateClient(svc, opts);
         var reply = await client.SendAsync("Do it");
         Assert.Contains("Explained", reply);
@@ -97,7 +97,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Route_Answer_EmptyFallsBack() {
         var svc = new FixedChatService("   ");
-        var opts = new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true };
+        var opts = new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true };
         var client = CreateClient(svc, opts);
         var reply = await client.SendAsync("Question");
         Assert.False(string.IsNullOrEmpty(reply));
@@ -106,7 +106,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Streaming_Answer_Path() {
         var svc = new FixedChatService("Plain answer");
-        var opts = new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true };
+        var opts = new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true };
         var client = CreateClient(svc, opts);
         var chunks = new List<string>();
         await foreach (var c in client.SendStreamingAsync("hi")) chunks.Add(c);
@@ -116,7 +116,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Streaming_Script_Path_DirectSkipAnswer() {
         var svc = new FixedChatService("return 3;", "Explanation 3");
-        var opts = new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false };
+        var opts = new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false };
         var client = CreateClient(svc, opts);
         var list = new List<string>();
         await foreach (var c in client.SendStreamingAsync("task")) list.Add(c);
@@ -126,7 +126,7 @@ public class AsonClientOrchestrationTests {
     [Fact]
     public async Task Streaming_Answer_When_First_Word_Not_Script() {
         var svc = new FixedChatService("  SCRIPTING more text");
-        var opts = new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true };
+        var opts = new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true };
         var client = CreateClient(svc, opts);
         var list = new List<string>();
         await foreach (var c in client.SendStreamingAsync("task")) list.Add(c);

@@ -21,11 +21,11 @@ internal static class TestHarness {
         var root = new RootOperator(new object());
         var options = opts ?? new AsonClientOptions();
         options = new AsonClientOptions {
-            SkipAnswerAgent = options.SkipAnswerAgent,
+            SkipReceptionAgent = options.SkipReceptionAgent,
             SkipExplainerAgent = options.SkipExplainerAgent,
             MaxFixAttempts = options.MaxFixAttempts,
             ScriptChatCompletion = chat,
-            AnswerChatCompletion = chat,
+            ReceptionChatCompletion = chat,
             ExplainerChatCompletion = chat,
             ExecutionMode = ExecutionMode.InProcess
         };

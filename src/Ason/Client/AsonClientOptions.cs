@@ -9,14 +9,14 @@ public sealed class AsonClientOptions {
     public ILogger? Logger { get; init; }
     public int MaxFixAttempts { get; init; } = 2;
     public string? ScriptInstructions { get; init; }
-    public string? AnswerInstructions { get; init; }
+    public string? ReceptionInstructions { get; init; }
     public string? ExplainerInstructions { get; init; }
 
     public IChatCompletionService? ScriptChatCompletion { get; init; }
-    public IChatCompletionService? AnswerChatCompletion { get; init; }
+    public IChatCompletionService? ReceptionChatCompletion { get; init; }
     public IChatCompletionService? ExplainerChatCompletion { get; init; }
 
-    public bool SkipAnswerAgent { get; init; } = false;
+    public bool SkipReceptionAgent { get; init; } = false;
     public bool SkipExplainerAgent { get; init; } = false;
 
     // Runner execution mode moved from AsonClient constructor

@@ -8,11 +8,11 @@ namespace Ason.Tests.Infrastructure;
 // Deterministic stub implementing just enough of IChatCompletionService for tests.
 internal sealed class StubChatCompletionService : IChatCompletionService {
     private readonly ConcurrentQueue<string> _scriptReplies = new();
-    private readonly ConcurrentQueue<string> _answerReplies = new();
+    private readonly ConcurrentQueue<string> _receptionReplies = new();
     private readonly ConcurrentQueue<string> _explainerReplies = new();
 
     public void EnqueueScript(params string[] replies) { foreach (var r in replies) _scriptReplies.Enqueue(r); }
-    public void EnqueueAnswer(params string[] replies) { foreach (var r in replies) _answerReplies.Enqueue(r); }
+    public void EnqueueReception(params string[] replies) { foreach (var r in replies) _receptionReplies.Enqueue(r); }
     public void EnqueueExplainer(params string[] replies) { foreach (var r in replies) _explainerReplies.Enqueue(r); }
 
     private string DequeueOrDefault(ConcurrentQueue<string> q, string def) => q.TryDequeue(out var v) ? v : def;
@@ -20,11 +20,11 @@ internal sealed class StubChatCompletionService : IChatCompletionService {
     // Provide empty dictionary to satisfy non-nullable contract
     public IReadOnlyDictionary<string, object?> Attributes { get; } = new Dictionary<string, object?>();
 
-    // Return a single assistant message choosing priority: script -> answer -> explainer
+    // Return a single assistant message choosing priority: script -> reception -> explainer
     public async IAsyncEnumerable<ChatMessageContent> GetChatMessageContentsAsync(IEnumerable<ChatMessageContent> messages, ChatOptions? options = null, Kernel? kernel = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default) {
         string text;
         if (!_scriptReplies.IsEmpty) text = DequeueOrDefault(_scriptReplies, "// default script\nreturn null;");
-        else if (!_answerReplies.IsEmpty) text = DequeueOrDefault(_answerReplies, "script");
+        else if (!_receptionReplies.IsEmpty) text = DequeueOrDefault(_receptionReplies, "script");
         else if (!_explainerReplies.IsEmpty) text = DequeueOrDefault(_explainerReplies, "Explanation");
         else text = "script";
         yield return new ChatMessageContent(AuthorRole.Assistant, text);

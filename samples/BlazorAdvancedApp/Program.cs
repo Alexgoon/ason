@@ -1,12 +1,13 @@
-using MudBlazor.Services;
-using BlazorAdvancedApp.Components;
 using Ason;
 using Ason.CodeGen; 
 using AsonRunner;
-using BlazorAdvancedApp.State;
+using BlazorAdvancedApp.AI;
+using BlazorAdvancedApp.Components;
 using BlazorAdvancedApp.Services; // added
-using System.Reflection;
+using BlazorAdvancedApp.State;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using MudBlazor.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,13 +19,13 @@ builder.Services.AddAson(
     defaultChatCompletionFactory: sp => new OpenAIChatCompletionService("gpt-4.1-mini", Environment.GetEnvironmentVariable("MY_OPEN_AI_KEY") ?? string.Empty),
     rootOperatorFactory: sp => sp.GetRequiredService<SessionState>().MainAppOperator,
     operators: new OperatorBuilder()
-                    .AddAssemblies(typeof(RootOperator).Assembly, Assembly.GetExecutingAssembly())
+                    .AddAssemblies(typeof(BlazorMainAppOperator).Assembly)
                     .AddExtractor()
                     .Build(),
     configureOptions: opt => {
         opt.RunnerMode = ExecutionMode.Docker;
         opt.MaxFixAttempts = 2;
-        opt.SkipAnswerAgent = false;
+        opt.SkipReceptionAgent = false;
     });
 
 builder.Services.AddMudServices();

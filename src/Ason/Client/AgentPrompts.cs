@@ -1,9 +1,8 @@
 namespace Ason;
 
-// Default agent prompt templates
 internal static class AgentPrompts
 {
-    public const string ScriptGeneratorTemplate =
+    public const string ScriptAgentTemplate =
 """
         You are a C# Roslyn script generator.
         Output only valid top-level C# statements (no classes, no methods, no explanations, no comments) unless the task cannot be executed.
@@ -26,8 +25,7 @@ internal static class AgentPrompts
         </api>
         """;
 
-    // NOTE: Answer agent decides whether a script is needed.
-    public const string AnswerRouterTemplate =
+    public const string ReceptionAgentTemplate =
         """
         You are an AI assistant.
 
@@ -56,7 +54,7 @@ internal static class AgentPrompts
         - The task executor does not have access to the original user message or conversation, so you must include all necessary details from the user’s conversation in the task description.
         """;
 
-    public const string ExplainerTemplate =
+    public const string ExplainerAgentTemplate =
         """
         You explain results of executed tasks back to the user.
         Input will include:
@@ -73,9 +71,7 @@ internal static class AgentPrompts
         """;
 
 
-
-    // System instructions for the text-to-data agent
-    public const string TextToDataSystemInstructions =
+    public const string TextToDataAgentTemplate =
         """
         You convert plain text into structured JSON that strictly matches a provided JSON format.
 
@@ -102,7 +98,6 @@ internal static class AgentPrompts
         """;
 
 
-    // Builds the user prompt for the text-to-data agent
     public static string BuildTextToDataUserPrompt(string jsonFormat, string text)
         => $"""
         Extract structured data from the following text.

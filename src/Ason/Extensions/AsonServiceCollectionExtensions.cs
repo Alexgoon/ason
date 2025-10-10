@@ -19,15 +19,15 @@ public sealed class AsonRegistrationOptions
     public ILogger? Logger { get; set; }
     public int MaxFixAttempts { get; set; } = 2;
     public string? ScriptInstructions { get; set; }
-    public string? AnswerInstructions { get; set; }
+    public string? ReceptionInstructions { get; set; }
     public string? ExplainerInstructions { get; set; }
 
     // You can either supply factories below OR let these stay null to fall back to defaultChatCompletion
     public Func<IServiceProvider, IChatCompletionService>? ScriptChatCompletionFactory { get; set; }
-    public Func<IServiceProvider, IChatCompletionService>? AnswerChatCompletionFactory { get; set; }
+    public Func<IServiceProvider, IChatCompletionService>? ReceptionChatCompletionFactory { get; set; }
     public Func<IServiceProvider, IChatCompletionService>? ExplainerChatCompletionFactory { get; set; }
 
-    public bool SkipAnswerAgent { get; set; } = false;
+    public bool SkipReceptionAgent { get; set; } = false;
     public bool SkipExplainerAgent { get; set; } = false;
 
     public ExecutionMode RunnerMode { get; set; } = ExecutionMode.InProcess;
@@ -81,12 +81,12 @@ public static class AsonServiceCollectionExtensions
                 Logger = reg.Logger,
                 MaxFixAttempts = reg.MaxFixAttempts,
                 ScriptInstructions = reg.ScriptInstructions,
-                AnswerInstructions = reg.AnswerInstructions,
+                ReceptionInstructions = reg.ReceptionInstructions,
                 ExplainerInstructions = reg.ExplainerInstructions,
                 ScriptChatCompletion = reg.ScriptChatCompletionFactory?.Invoke(sp),
-                AnswerChatCompletion = reg.AnswerChatCompletionFactory?.Invoke(sp),
+                ReceptionChatCompletion = reg.ReceptionChatCompletionFactory?.Invoke(sp),
                 ExplainerChatCompletion = reg.ExplainerChatCompletionFactory?.Invoke(sp),
-                SkipAnswerAgent = reg.SkipAnswerAgent,
+                SkipReceptionAgent = reg.SkipReceptionAgent,
                 SkipExplainerAgent = reg.SkipExplainerAgent,
                 ExecutionMode = reg.RunnerMode,
                 AllowTextExtractor = reg.AllowTextExtractor,

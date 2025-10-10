@@ -21,7 +21,7 @@ public sealed record OrchestrationResult(bool Success, string Route, string? Res
 
 public class AsonClient : IChatClient {
     readonly Kernel _scriptKernel;
-    readonly Kernel _answerKernel;
+    readonly Kernel _receptionKernel;
     readonly Kernel _explainerKernel;
 
     readonly RunnerClient _runner;
@@ -31,7 +31,7 @@ public class AsonClient : IChatClient {
     Task _proxyAugmentationTask = Task.CompletedTask; // waits for dynamic MCP code if any
 
     ChatCompletionAgent? _scriptAgent;
-    ChatCompletionAgent? _answerAgent;
+    ChatCompletionAgent? _receptionAgent;
     ChatCompletionAgent? _explainerAgent;
     RootOperator _rootOperator;
 
@@ -54,12 +54,12 @@ public class AsonClient : IChatClient {
     public int MaxScriptFixAttempts { get; } = 2;
     public IChatCompletionService DefaultChatCompletion { get; }
     public IChatCompletionService ScriptChatCompletion { get; }
-    public IChatCompletionService AnswerChatCompletion { get; }
+    public IChatCompletionService ReceptionChatCompletion { get; }
     public IChatCompletionService ExplainerChatCompletion { get; }
 
-    internal Kernel AnswerKernel => _answerKernel;
+    internal Kernel ReceptionKernel => _receptionKernel;
 
-    string? _consolidatedUserTask; // task synthesized by AnswerAgent when routing to script
+    string? _consolidatedUserTask; 
 
     public AsonClient(
         IChatCompletionService defaultChatCompletion,
@@ -80,7 +80,7 @@ public class AsonClient : IChatClient {
 
         DefaultChatCompletion = defaultChatCompletion;
         ScriptChatCompletion = _options.ScriptChatCompletion ?? defaultChatCompletion;
-        AnswerChatCompletion = _options.AnswerChatCompletion ?? defaultChatCompletion;
+        ReceptionChatCompletion = _options.ReceptionChatCompletion ?? defaultChatCompletion;
         ExplainerChatCompletion = _options.ExplainerChatCompletion ?? defaultChatCompletion;
 
         _rootOperator = rootOperator;
@@ -90,7 +90,7 @@ public class AsonClient : IChatClient {
         }
 
         _scriptKernel = BuildKernel(ScriptChatCompletion);
-        _answerKernel = BuildKernel(AnswerChatCompletion);
+        _receptionKernel = BuildKernel(ReceptionChatCompletion);
         _explainerKernel = BuildKernel(ExplainerChatCompletion);
 
         _runner = new RunnerClient(rootOperator.OperatorInstances, SynchronizationContext.Current) { Mode = _options.ExecutionMode };
@@ -203,23 +203,23 @@ public class AsonClient : IChatClient {
         return builder.Build();
     }
 
-    string BuildAnswerInstructions() {
-        if (!string.IsNullOrWhiteSpace(_options.AnswerInstructions)) return _options.AnswerInstructions;
-        return AgentPrompts.AnswerRouterTemplate;
+    string BuildReceptionInstructions() {
+        if (!string.IsNullOrWhiteSpace(_options.ReceptionInstructions)) return _options.ReceptionInstructions;
+        return AgentPrompts.ReceptionAgentTemplate;
     }
 
     void InitAgents() {
         _scriptAgent = CreateAgent(
             "ScriptGenerator",
-            _options.ScriptInstructions ?? string.Format(AgentPrompts.ScriptGeneratorTemplate, _signatures ?? string.Empty),
+            _options.ScriptInstructions ?? string.Format(AgentPrompts.ScriptAgentTemplate, _signatures ?? string.Empty),
             _scriptKernel);
-        _answerAgent = CreateAgent(
+        _receptionAgent = CreateAgent(
             "Assistant",
-            BuildAnswerInstructions(),
-            _answerKernel);
+            BuildReceptionInstructions(),
+            _receptionKernel);
         _explainerAgent = CreateAgent(
             "Explainer",
-            _options.ExplainerInstructions ?? AgentPrompts.ExplainerTemplate,
+            _options.ExplainerInstructions ?? AgentPrompts.ExplainerAgentTemplate,
             _explainerKernel);
     }
 
@@ -229,7 +229,7 @@ public class AsonClient : IChatClient {
     async Task EnsureReadyAsync() {
         await _proxyAugmentationTask.ConfigureAwait(false);
         await _runnerStart.ConfigureAwait(false);
-        if (_scriptAgent is null || _answerAgent is null || _explainerAgent is null || string.IsNullOrWhiteSpace(_proxies)) {
+        if (_scriptAgent is null || _receptionAgent is null || _explainerAgent is null || string.IsNullOrWhiteSpace(_proxies)) {
             throw new InvalidOperationException("Proxies not initialized.");
         }
     }
@@ -237,18 +237,18 @@ public class AsonClient : IChatClient {
     enum RouteKind { Script, Answer }
 
     // ASYNC refactor: avoid blocking UI thread with GetAwaiter().GetResult()
-    async Task<(RouteKind route, string payload)> DecideRouteAdvanceAsync(string userTask, bool skipAnswer, ChatCompletionAgent? answerAgent, ChatHistoryAgentThread thread, Action<LogLevel, string, Exception?> log, CancellationToken ct) {
-        if (skipAnswer) { log(LogLevel.Information, "Skipping AnswerAgent; routing directly to ScriptAgent.", null); _consolidatedUserTask = userTask; return (RouteKind.Script, userTask); }
-        if (answerAgent is null) { _consolidatedUserTask ??= userTask; return (RouteKind.Script, userTask); }
+    async Task<(RouteKind route, string payload)> DecideRouteAdvanceAsync(string userTask, bool skipAnswer, ChatCompletionAgent? receptionAgent, ChatHistoryAgentThread thread, Action<LogLevel, string, Exception?> log, CancellationToken ct) {
+        if (skipAnswer) { log(LogLevel.Information, "Skipping ReceptionAgent; routing directly to ScriptAgent.", null); _consolidatedUserTask = userTask; return (RouteKind.Script, userTask); }
+        if (receptionAgent is null) { _consolidatedUserTask ??= userTask; return (RouteKind.Script, userTask); }
         var sb = new StringBuilder();
         try {
             var messages = new[] { new ChatMessageContent(AuthorRole.User, userTask) };
-            await foreach (var item in answerAgent.InvokeAsync(messages, thread: thread, options: null, cancellationToken: ct).ConfigureAwait(false)) {
+            await foreach (var item in receptionAgent.InvokeAsync(messages, thread: thread, options: null, cancellationToken: ct).ConfigureAwait(false)) {
                 var part = item.Message?.Content; if (!string.IsNullOrWhiteSpace(part)) sb.Append(part);
             }
             var decisionRaw = sb.ToString();
             var trimmed = decisionRaw.Trim();
-            log(LogLevel.Information, $"AnswerAgent raw output: {trimmed}", null);
+            log(LogLevel.Information, $"ReceptionAgent raw output: {trimmed}", null);
             if (string.IsNullOrWhiteSpace(trimmed)) { _consolidatedUserTask = userTask; return (RouteKind.Script, userTask); }
             if (trimmed.StartsWith("script", StringComparison.OrdinalIgnoreCase)) {
                 string synthesized = ExtractTaskBlock(trimmed) ?? userTask;
@@ -258,16 +258,16 @@ public class AsonClient : IChatClient {
             _consolidatedUserTask = null; // direct answer path
             return (RouteKind.Answer, trimmed);
         }
-        catch (Exception ex) { log(LogLevel.Error, "AnswerAgent routing error", ex); throw; }
+        catch (Exception ex) { log(LogLevel.Error, "ReceptionAgent routing error", ex); throw; }
     }
 
-    static string? ExtractTaskBlock(string answerAgentOutput) {
-        int start = answerAgentOutput.IndexOf("<task>", StringComparison.OrdinalIgnoreCase);
+    static string? ExtractTaskBlock(string receptionAgentOutput) {
+        int start = receptionAgentOutput.IndexOf("<task>", StringComparison.OrdinalIgnoreCase);
         if (start < 0) return null;
-        int end = answerAgentOutput.IndexOf("</task>", start, StringComparison.OrdinalIgnoreCase);
+        int end = receptionAgentOutput.IndexOf("</task>", start, StringComparison.OrdinalIgnoreCase);
         if (end < 0) return null;
         int innerStart = start + "<task>".Length;
-        var inner = answerAgentOutput.Substring(innerStart, end - innerStart).Trim();
+        var inner = receptionAgentOutput.Substring(innerStart, end - innerStart).Trim();
         return string.IsNullOrWhiteSpace(inner) ? null : inner;
     }
 
@@ -310,9 +310,9 @@ public class AsonClient : IChatClient {
         // Offload entire orchestration to background thread so caller's (UI) sync context is not blocked
         return await Task.Run(async () => {
             string userTask = ExtractLatestUserMessage(thread) ?? string.Empty;
-            bool skipAnswer = _options.SkipAnswerAgent;
+            bool skipAnswer = _options.SkipReceptionAgent;
             bool skipExplainer = _options.SkipExplainerAgent;
-            var (route, payload) = await DecideRouteAdvanceAsync(userTask, skipAnswer, _answerAgent, thread, (lvl, msg, ex) => OnLog(lvl, msg, ex), cancellationToken).ConfigureAwait(false);
+            var (route, payload) = await DecideRouteAdvanceAsync(userTask, skipAnswer, _receptionAgent, thread, (lvl, msg, ex) => OnLog(lvl, msg, ex), cancellationToken).ConfigureAwait(false);
             if (route == RouteKind.Answer) { thread.ChatHistory.AddAssistantMessage(payload); return new OrchestrationResult(true, "answer", payload, null, null, 1); }
             // payload may already be synthesized task if script route selected
             var effectiveTask = _consolidatedUserTask ?? userTask;
@@ -444,16 +444,16 @@ public class AsonClient : IChatClient {
     private async Task ExecuteInternalStreamingCoreAsync(IEnumerable<ChatMessage> messages, ChannelWriter<ChatResponseUpdate> writer, CancellationToken cancellationToken) {
         await EnsureReadyAsync().ConfigureAwait(false);
         var (thread, userTask) = PrepareThreadFromMessages(messages);
-        bool skipAnswer = _options.SkipAnswerAgent;
+        bool skipAnswer = _options.SkipReceptionAgent;
         bool skipExplainer = _options.SkipExplainerAgent;
         bool proceedToScript = false;
         _consolidatedUserTask = null;
-        if (skipAnswer) { OnLog(LogLevel.Information, "Skipping AnswerAgent; routing directly to ScriptAgent."); _consolidatedUserTask = userTask; proceedToScript = true; }
+        if (skipAnswer) { OnLog(LogLevel.Information, "Skipping ReceptionAgent; routing directly to ScriptAgent."); _consolidatedUserTask = userTask; proceedToScript = true; }
         else {
             var sb = new StringBuilder(); 
             bool bufferingPossibleScript = true;
             bool collectingTaskBlock = false;
-            await foreach (var item in _answerAgent!.InvokeStreamingAsync(thread: thread, options: null, cancellationToken).ConfigureAwait(false)) {
+            await foreach (var item in _receptionAgent!.InvokeStreamingAsync(thread: thread, options: null, cancellationToken).ConfigureAwait(false)) {
                 var part = item.Message?.Content;
                 if (part is null) continue;
                 sb.Append(part);

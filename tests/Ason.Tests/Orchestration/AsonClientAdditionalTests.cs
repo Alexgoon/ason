@@ -55,11 +55,11 @@ public class AsonClientAdditionalTests {
 
     private static AsonClient CreateClient(IChatCompletionService answerSvc, IScriptRepairExecutor repair, AsonClientOptions? opts = null) {
         var root = new RootOperator(new object());
-        var options = opts ?? new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true };
+        var options = opts ?? new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true };
         var client = new AsonClient(answerSvc, root, Snapshot, new AsonClientOptions {
-            SkipAnswerAgent = options.SkipAnswerAgent,
+            SkipReceptionAgent = options.SkipReceptionAgent,
             SkipExplainerAgent = options.SkipExplainerAgent,
-            AnswerChatCompletion = answerSvc,
+            ReceptionChatCompletion = answerSvc,
             ScriptChatCompletion = answerSvc,
             ExplainerChatCompletion = answerSvc,
             MaxFixAttempts = 1,
@@ -99,7 +99,7 @@ public class AsonClientAdditionalTests {
             int local = i;
             var chat = new DelayedQueueChatService(0, "script", $"return {local};", $"Explanation {local}");
             var root = new RootOperator(new object());
-            var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess }, null, new KeywordScriptValidator(Array.Empty<string>()), null);
+            var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess }, null, new KeywordScriptValidator(Array.Empty<string>()), null);
             tasks.Add(client.SendAsync($"Task {local}"));
         }
         var results = await Task.WhenAll(tasks);
@@ -110,7 +110,7 @@ public class AsonClientAdditionalTests {
     public async Task ProxyRegeneration_Unchanged_When_No_New_Operators() {
         var chat = new DelayedQueueChatService(0, "script", "return 1;", "Expl");
         var root = new RootOperator(new object());
-        var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess });
+        var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess });
         // capture proxies via reflection
         var field = typeof(AsonClient).GetField("_proxies", BindingFlags.NonPublic | BindingFlags.Instance);
         string first = (string)field!.GetValue(client)!;
@@ -124,7 +124,7 @@ public class AsonClientAdditionalTests {
         var chat = new DelayedQueueChatService(0, "script", "return 2;", "Explanation 2");
         var root = new RootOperator(new object());
         var logs = new List<string>();
-        var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess });
+        var client = new AsonClient(chat, root, Snapshot, new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false, ExecutionMode = ExecutionMode.InProcess });
         client.Log += (s,e)=> logs.Add(e.Message);
         _ = await client.SendAsync("calc");
         // ensure execution success appears before any explanation generated log (if present)
@@ -137,7 +137,7 @@ public class AsonClientAdditionalTests {
     public async Task LargeStreamingScriptAssembly() {
         var streamer = new FragmentedScriptWordService();
         var root = new RootOperator(new object());
-        var client = new AsonClient(streamer, root, Snapshot, new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true, ExecutionMode = ExecutionMode.InProcess });
+        var client = new AsonClient(streamer, root, Snapshot, new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true, ExecutionMode = ExecutionMode.InProcess });
         var chunks = new List<string>();
         await foreach (var c in client.SendStreamingAsync("task")) chunks.Add(c);
         string combined = string.Concat(chunks);

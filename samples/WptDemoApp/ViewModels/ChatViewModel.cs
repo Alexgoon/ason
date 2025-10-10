@@ -60,7 +60,7 @@ public partial class ChatViewModel : ObservableObject {
         var operators = GetOperators();
         var options = new AsonClientOptions {
             MaxFixAttempts = 2,
-            SkipAnswerAgent = false,
+            SkipReceptionAgent = false,
             ExecutionMode = ExecutionMode.InProcess,
             //RunnerExecutablePath = @"..\..\..\..\..\src\bin\Debug\net9.0"
             //UseRemoteRunner = true,

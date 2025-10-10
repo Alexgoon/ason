@@ -51,10 +51,10 @@ public class AsonClientEndToEndTests {
         var options = opts ?? new AsonClientOptions();
         options = new AsonClientOptions {
             MaxFixAttempts = options.MaxFixAttempts,
-            SkipAnswerAgent = options.SkipAnswerAgent,
+            SkipReceptionAgent = options.SkipReceptionAgent,
             SkipExplainerAgent = options.SkipExplainerAgent,
             ScriptChatCompletion = scriptSvc,
-            AnswerChatCompletion = answerSvc ?? scriptSvc,
+            ReceptionChatCompletion = answerSvc ?? scriptSvc,
             ExplainerChatCompletion = explainerSvc ?? scriptSvc,
             ForbiddenScriptKeywords = new string[0],
             AllowTextExtractor = true,
@@ -70,7 +70,7 @@ public class AsonClientEndToEndTests {
         var explainerSvc = new QueueChatService("The result is 5.");
         var validator = new KeywordScriptValidator(System.Array.Empty<string>());
         var client = CreateClient(scriptSvc, explainerSvc: explainerSvc, answerSvc: new QueueChatService("script"),
-            opts: new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false }, validator: validator);
+            opts: new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false }, validator: validator);
         List<(LogLevel lvl,string msg)> logs = new();
         client.Log += (s,e)=> logs.Add((e.Level, e.Message));
         var reply = await client.SendAsync("Compute 2+3");
@@ -84,7 +84,7 @@ public class AsonClientEndToEndTests {
         var scriptSvc = new QueueChatService("BAD return 1;", "return 2;");
         var validator = new TestValidator(s => s.Contains("BAD") ? "Validation failed" : null);
         var client = CreateClient(scriptSvc, answerSvc: new QueueChatService("script"),
-            opts: new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = true, MaxFixAttempts = 2 }, validator: validator);
+            opts: new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = true, MaxFixAttempts = 2 }, validator: validator);
         List<string> logMessages = new();
         client.Log += (s,e)=> logMessages.Add(e.Message);
         var reply = await client.SendAsync("Task");
@@ -98,7 +98,7 @@ public class AsonClientEndToEndTests {
         var scriptSvc = new QueueChatService("throw new System.Exception(\"boom\");", "return 7;");
         var validator = new TestValidator(_ => null);
         var client = CreateClient(scriptSvc, answerSvc: new QueueChatService("script"),
-            opts: new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = true, MaxFixAttempts = 2 }, validator: validator);
+            opts: new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = true, MaxFixAttempts = 2 }, validator: validator);
         List<string> logs = new();
         client.Log += (s,e)=> logs.Add(e.Message);
         var reply = await client.SendAsync("Compute");
@@ -112,7 +112,7 @@ public class AsonClientEndToEndTests {
         var explainerSvc = new QueueChatService("   ");
         var validator = new TestValidator(_ => null);
         var client = CreateClient(scriptSvc, explainerSvc: explainerSvc, answerSvc: new QueueChatService("script"),
-            opts: new AsonClientOptions { SkipAnswerAgent = true, SkipExplainerAgent = false }, validator: validator);
+            opts: new AsonClientOptions { SkipReceptionAgent = true, SkipExplainerAgent = false }, validator: validator);
         var reply = await client.SendAsync("Compute");
         Assert.Equal("9", reply);
     }

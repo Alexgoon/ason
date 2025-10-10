@@ -52,7 +52,7 @@ public class LoggingAndEventsTests {
     private AsonClient CreateClient(IChatCompletionService svc, IScriptRepairExecutor? repair = null) {
         var root = new RootOperator(new object());
         var snapshot = BuildSnapshot();
-        var client = new AsonClient(svc, root, snapshot, new AsonClientOptions { SkipAnswerAgent = false, SkipExplainerAgent = true, ExecutionMode = ExecutionMode.InProcess }, repair, new KeywordScriptValidator(Array.Empty<string>()), new ResultExplainer());
+        var client = new AsonClient(svc, root, snapshot, new AsonClientOptions { SkipReceptionAgent = false, SkipExplainerAgent = true, ExecutionMode = ExecutionMode.InProcess }, repair, new KeywordScriptValidator(Array.Empty<string>()), new ResultExplainer());
         return client;
     }
 

@@ -21,7 +21,7 @@ internal class ExtractionOperator : RootOperator {
         var agent = new ChatCompletionAgent {
             Name = "PropertyExtractorAgent",
             Instructions = "You are an information extraction agent. GIVEN: (1) a list of exact property names, (2) raw unstructured text. TASK: Return ONLY one minified JSON object. RULES: (a) Keys must be EXACTLY the provided property names (respect casing). (b) Each value is either a best‑guess substring from the text (trim surrounding punctuation/quotes) or null if no plausible candidate. (c) Never invent keys, never output explanations, comments, markdown or code fences. (d) Use best judgement; prefer a non‑null value when the text strongly implies it. Use null only when the text truly lacks an answer. (e) Do not output placeholders like 'unknown', '', 'n/a'. OUTPUT MUST be strictly valid minified JSON. EXAMPLES OUTPUT: {\"Name\":\"Jim\",\"Company\":\"Fabrikam Inc.\"}",
-            Kernel = orchestrator.AnswerKernel
+            Kernel = orchestrator.ReceptionKernel
         };
 
         var propsBlock = string.Join("\n", propertiesToExtract);
