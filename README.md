@@ -12,7 +12,9 @@ ASON offers greater flexibility, performance, and efficiency when integrating AI
 
 **1. Install ASON project templates**
 
+```
 > dotnet new install Ason.ProjectTemplates
+```
 
 **2. Create a project**
 You can create a Blazor, WPF, WinForms, MAUI, or Console application:
