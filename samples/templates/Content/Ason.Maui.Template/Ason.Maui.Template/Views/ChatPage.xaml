@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Ason.Maui.Template.Views.ChatPage">
+    <Grid Margin="10,0,10,0"
+          Grid.Column="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Text="{Binding ChatResponse}"
+               VerticalTextAlignment="Start"
+               LineBreakMode="WordWrap"
+               Grid.ColumnSpan="2"
+               Margin="0,0,0,10" />
+        <ActivityIndicator VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           IsRunning="{Binding SendMessageCommand.IsRunning}"
+                           Margin="0,6"
+                           Grid.ColumnSpan="2" />
+        <Editor x:Name="InputTextBox"
+                Text="{Binding UserInput}"
+                AutoSize="TextChanges"
+                Grid.Row="2"
+                Margin="0,0,0,10"
+                MinimumHeightRequest="80">
+        </Editor>
+        <Button Command="{Binding SendMessageCommand}"
+                Text="➤"
+                VerticalOptions="End"
+                Margin="8,0,0,10"
+                Padding="8,4"
+                Width="30"
+                BorderWidth="1"
+                Grid.Row="2"
+                Grid.Column="1" />
+    </Grid>
+</ContentPage>

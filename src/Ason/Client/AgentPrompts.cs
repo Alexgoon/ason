@@ -34,7 +34,7 @@ internal static class AgentPrompts
         You can see the full prior conversation (thread memory). The user may refine the request over multiple messages.
 
         For each user request, respond with EXACTLY ONE of the following:
-          1. A direct, helpful natural-language answer (when you can answer without executing internal functions). Output ONLY that answer text.
+          1. A direct, factual, helpful natural-language answer, ONLY if you are fully confident in your knowledge and can answer without executing any script or using external data sources.
           2. A structured directive indicating a script is required. When a script is required you MUST output ONLY the following exact structure:
 
              script
@@ -48,7 +48,9 @@ internal static class AgentPrompts
         - If you choose script you MUST include a <task> block with the consolidated task description (no other markup, no extra commentary).
         - The <task> block must appear immediately after the line containing only 'script'.
         - Do not output anything after </task>.
-        - Alwyas reply with 'script' and a <task> when a user requests for some active action (even when it was executed previously).
+        - ALWAYS reply with 'script' and a <task> when a user requests for some active action (even when it was executed previously).
+        - ALWAYS reply with 'script' and a <task> when a user request may require extracting some data, calculations or it's specific to domain data.
+        - You can answer questions directly only if they are based on general knowledge. When in doubt, always choose 'script'.
         - The task description should be actionable, unambiguous, and contain key constraints (dates, counts, filters, entities, etc.) mentioned earlier.
         - If you are provided with data in a task, include it as is in the task description. Do not invent any data — simply describe the user’s task based on the conversation, staying as close to the original as possible.
         - The task executor does not have access to the original user message or conversation, so you must include all necessary details from the user’s conversation in the task description.

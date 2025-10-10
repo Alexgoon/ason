@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:m="clr-namespace:Ason.Maui.Template.Model"
+             xmlns:vm="clr-namespace:Ason.Maui.Template.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Name="page"
+             x:Class="Ason.Maui.Template.Views.CustomersPage"
+             x:DataType="vm:CustomersViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                                        Command="{Binding InitializeCommand}"
+                                        BindingContext="{Binding Source={x:Reference page}, Path=BindingContext}" />
+    </ContentPage.Behaviors>
+    <CollectionView ItemsSource="{Binding Customers}">
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="m:Customer">
+                <StackLayout Padding="10">
+                    <Label Text="{Binding Name}"
+                           FontSize="20" />
+                    <Label Text="{Binding Email}"/>
+                    <Label Text="{Binding Phone}"/>
+                    <Label Text="{Binding Address}"/>
+                </StackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+</ContentPage>

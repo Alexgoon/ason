@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="Ason.Maui.Template.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:v="clr-namespace:Ason.Maui.Template.Views"
+       Title="Ason.Maui.Template"
+       Shell.FlyoutBehavior="Disabled">
+    <TabBar>
+        <Tab Title="Chat">
+            <ShellContent Route="chat" ContentTemplate="{DataTemplate v:ChatPage}" />
+        </Tab>
+        <Tab Title="Customers">
+            <ShellContent Route="customers" ContentTemplate="{DataTemplate v:CustomersPage}" />
+        </Tab>
+        <Tab Title="Orders">
+            <ShellContent Route="orders" ContentTemplate="{DataTemplate v:OrdersPage}" />
+        </Tab>
+    </TabBar>
+</Shell>

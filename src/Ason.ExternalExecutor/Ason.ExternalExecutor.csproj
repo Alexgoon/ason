@@ -34,6 +34,8 @@
 			<Pack>true</Pack>
 			<PackagePath>buildTransitive/</PackagePath>
 		</Content>
+		<!-- Explicitly include the targets file in the nupkg (SDK does not auto-include arbitrary buildTransitive files inside project dir unless marked) -->
+		<None Include="buildTransitive/Ason.ExternalExecutor.targets" Pack="true" PackagePath="buildTransitive/" />
 	</ItemGroup>
 
 	<ItemGroup>

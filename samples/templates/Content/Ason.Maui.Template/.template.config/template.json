@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Alexgoon",
+  "classifications": [ "Ason", "MAUI", "Adroid", "iOS", "Windows", "macOS", "AI" ],
+  "name": "Ason MAUI Application",
+  "description": "Creates a MAUI application preconfigured with ASON integration.",
+  "identity": "Ason.MAUI",
+  "groupIdentity": "Ason.MAUI",
+  "shortName": "ason.maui",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Ason.Maui.Template",
+  "generatorVersions": "[1.0.0.0-*)",
+  "precedence": "3000",
+  "preferNameDirectory": true,
+  "primaryOutputs": [
+    { "path": "Ason.Maui.Template.sln" },
+    { "path": "Ason.Maui.Template\\Ason.Maui.Template.csproj" },
+    { "path": "Ason.Maui.Template.Server\\Ason.Maui.Template.Server.csproj" }
+  ],
+  "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "description": "Specifies the target framework. It expects a target framework moniker (TFM). Examples: net8.0, net8.0-windows.",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net8.0-windows",
+          "displayName": ".NET 8 (LTS)", "description": "TargetFramework: .NET 8 (LTS)"
+        },
+        {
+          "choice": "net9.0-windows",
+          "displayName": ".NET 9 (STS)", "description": "TargetFramework: .NET 9 (STS)"
+        }
+      ],
+      "replaces": "net9.0-windows",
+      "defaultValue": "net9.0-windows"
+    },
+    "langVersion": {
+      "type": "parameter",
+      "datatype": "text",
+      "description": "Sets the LangVersion property in the created project file. For example, use --langVersion 7.3 to use C# 7.3.",
+      "defaultValue": "",
+      "replaces": "$(ProjectLanguageVersion)"
+    },
+    "HostIdentifier": {
+      "type": "bind",
+      "binding": "HostIdentifier"
+    }
+  },
+  "defaultName": "AsonMauiApplication",
+  "postActions": [
+    {
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "description": "Restore NuGet packages required by this project.",
+      "condition": "(!skipRestore)",
+      "manualInstructions": [ { "text": "Run 'dotnet restore'" } ],
+      "continueOnError": true
+    }
+  ]
+}

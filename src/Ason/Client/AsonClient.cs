@@ -450,35 +450,34 @@ public class AsonClient : IChatClient {
         _consolidatedUserTask = null;
         if (skipAnswer) { OnLog(LogLevel.Information, "Skipping AnswerAgent; routing directly to ScriptAgent."); _consolidatedUserTask = userTask; proceedToScript = true; }
         else {
-            var sb = new StringBuilder(); // accumulate raw answer agent output
+            var sb = new StringBuilder(); 
             bool bufferingPossibleScript = true;
             bool collectingTaskBlock = false;
             await foreach (var item in _answerAgent!.InvokeStreamingAsync(thread: thread, options: null, cancellationToken).ConfigureAwait(false)) {
                 var part = item.Message?.Content;
-                if (string.IsNullOrWhiteSpace(part)) continue;
+                if (part is null) continue;
                 sb.Append(part);
+                var currentFull = sb.ToString();
+                var currentTrimmedStart = currentFull.TrimStart();
 
                 if (bufferingPossibleScript) {
-                    var current = sb.ToString();
-                    if (current.Equals("script", StringComparison.OrdinalIgnoreCase)) {
+                    if (currentTrimmedStart.Equals("script", StringComparison.OrdinalIgnoreCase)) {
                         proceedToScript = true;
                         bufferingPossibleScript = false;
-                        collectingTaskBlock = true;
-                        continue; // suppress routing keyword output
+                        collectingTaskBlock = true; 
+                        continue;
                     }
-                    if ("script".StartsWith(current, StringComparison.OrdinalIgnoreCase)) {
-                        continue; // still determining; do not emit yet
+                    if ("script".StartsWith(currentTrimmedStart, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
                     }
-                    // Not routing keyword => treat accumulated buffer as answer and emit once
-                    await writer.WriteAsync(new ChatResponseUpdate(ChatRole.Assistant, current), cancellationToken).ConfigureAwait(false);
+                    await writer.WriteAsync(new ChatResponseUpdate(ChatRole.Assistant, currentFull), cancellationToken).ConfigureAwait(false);
                     bufferingPossibleScript = false;
                 }
                 else if (collectingTaskBlock) {
-                    if (sb.ToString().IndexOf("</task>", StringComparison.OrdinalIgnoreCase) >= 0) break; // done collecting task block
-                    continue; // keep buffering silently
+                    if (currentFull.IndexOf("</task>", StringComparison.OrdinalIgnoreCase) >= 0) break;
+                    continue; 
                 }
                 else {
-                    // Regular answer path streaming
                     await writer.WriteAsync(new ChatResponseUpdate(ChatRole.Assistant, part), cancellationToken).ConfigureAwait(false);
                 }
             }
@@ -492,7 +491,7 @@ public class AsonClient : IChatClient {
                 if (string.IsNullOrWhiteSpace(full)) { proceedToScript = true; _consolidatedUserTask = userTask; }
                 else if (!full.Equals("script", StringComparison.OrdinalIgnoreCase)) {
                     if (!thread.ChatHistory.Any(m => m.Role == AuthorRole.Assistant && m.Content == full)) thread.ChatHistory.AddAssistantMessage(full);
-                    return; // answer path finished
+                    return; 
                 }
             }
         }

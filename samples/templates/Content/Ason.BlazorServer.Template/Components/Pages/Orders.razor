@@ -1,0 +1,59 @@
+﻿@page "/orders"
+@using Ason.BlazorServer.Template.Operators
+@using Ason.BlazorServer.Template.Model
+@using Ason.BlazorServer.Template.State
+@inject SessionState Session
+@attribute [StreamRendering]
+@implements IDisposable
+
+<PageTitle>Orders</PageTitle>
+
+<h1>Orders</h1>
+
+@if (OrdersSource?.Count > 0) {
+    <ul>
+        @foreach (var o in OrdersSource) {
+            <li>
+                @o.OrderId - @o.OrderDate.ToString("u") - @o.TotalAmount
+                <br />Customer: @o.Customer?.Id - @o.Customer?.Name - @o.Customer?.Email - @o.Customer?.Phone - @o.Customer?.Address
+            </li>
+        }
+    </ul>
+}
+else {
+    <p>No orders.</p>
+}
+
+@code {
+    public List<Order> OrdersSource => Session.Orders;
+
+    public void AddOrder(Order newOrder) {
+        Session.Orders.Add(newOrder);
+        StateHasChanged();
+    }
+
+    public void DeleteOrder(int orderId) {
+        var order = Session.Orders.FirstOrDefault(o => o.OrderId == orderId);
+        if (order == null)
+            return;
+        Session.Orders.Remove(order);
+        StateHasChanged();
+
+    }
+
+    public void EditOrder(Order updatedOrder) {
+        var oldOrder = Session.Orders.FirstOrDefault(c => c.OrderId == updatedOrder.OrderId);
+        if (oldOrder == null)
+            return;
+        var idx = Session.Orders.IndexOf(oldOrder);
+        Session.Orders[idx] = updatedOrder;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized() {
+        Session.MainAppOperator.AttachChildOperator<OrdersViewOperator>(this);
+    }
+    public void Dispose() {
+        Session.MainAppOperator.DetachChildOperator<OrdersViewOperator>();
+    }
+}

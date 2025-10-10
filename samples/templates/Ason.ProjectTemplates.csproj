@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Ason.Templates</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>ASON Project Templates</Title>
+    <Authors>Alexgoon</Authors>
+    <Description>ASON templates for Blazor, WPF, WinFormsm and MAUI</Description>
+    <PackageTags>dotnet-new;templates;Ason;Blazor;WPF;WinForms;MAUI</PackageTags>
+    <PackageType>Template</PackageType>
+    <TargetFramework>net9.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="*" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.vs\**;content\**\*.user;content\**\*.suo" Pack="true" PackagePath="content" />
+  </ItemGroup>
+</Project>

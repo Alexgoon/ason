@@ -16,17 +16,17 @@ public class BlazorMainAppOperator : RootOperator<SessionState> {
 
     [AsonMethod]
     public Task<EmployeesOperator> GetEmployeesOperatorAsync() {
-        return GetViewOperator<EmployeesOperator>(() => { AttachedObject.Nav.NavigateTo("/employees"); });
+        return GetViewOperator<EmployeesOperator>(() => AttachedObject.Nav.NavigateTo("/employees"));
     }
 
     [AsonMethod]
     public Task<EmailsOperator> GetEmailsOperatorAsync() {
-        return GetViewOperator<EmailsOperator>(() => { AttachedObject.Nav.NavigateTo("/emails"); });
+        return GetViewOperator<EmailsOperator>(() => AttachedObject.Nav.NavigateTo("/emails"));
     }
 
     [AsonMethod("Gets charts operator. Call this when creating/drawing charts")]
     public Task<ChartsOperator> GetChartsOperatorAsync() {
-        return GetViewOperator<ChartsOperator>(() => { AttachedObject.Nav.NavigateTo("/charts"); });
+        return GetViewOperator<ChartsOperator>(() => AttachedObject.Nav.NavigateTo("/charts"));
     }
 }
 
