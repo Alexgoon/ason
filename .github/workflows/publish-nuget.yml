@@ -66,7 +66,7 @@ jobs:
           dotnet build src/Ason.RemoteBridge/Ason.RemoteBridge.csproj --configuration Release
           dotnet pack src/Ason.RemoteBridge/Ason.RemoteBridge.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
 
-    - name: Build & Pack Ason.ProjectTemplates
+      - name: Build & Pack Ason.ProjectTemplates
         run: |
           dotnet restore samples/templates/Ason.ProjectTemplates.csproj
           dotnet pack samples/templates/Ason.ProjectTemplates.csproj \
