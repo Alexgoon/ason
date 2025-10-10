@@ -1,4 +1,5 @@
 # ASON (Agent Script Operation)
+![ASON Logo](images/ason_logo.jpeg)
 
 **ASON** is a lightweight framework that enables AI models to execute a sequence of functions in your application. Unlike traditional **MCP** or **tool-calling** mechanisms, ASON generates and executes complete scripts in a single pass.
 
@@ -41,7 +42,7 @@ However, you can also use other services supported by **Semantic Kernel** (see: 
 ## How ASON works
 
 Here’s a simplified overview of the ASON architecture:
-
+![ASON Flow Overview](images/flow-overview.jpg)
 1. Your application defines **operators** that execute methods in your code.  
 2. The **ASON Client** creates APIs (operator signatures) and passes them to the **Script Agent** along with the user’s task.  
 3. The **Script Agent** generates a script and sends it to the **execution environment** (same process, external process, Docker container, or remote server).  
@@ -106,7 +107,7 @@ public class MainAppOperator : RootOperator<MainViewModel> {
 
 Each operator contains APIs related to a specific **view**, **module**, or **service**.  
 A parent operator can create child operators using the `OperatorBase.GetViewOperator` method.
-
+![ASON Operators](images/operators.jpg)
 > **Important:** Always use `GetViewOperator` to create child operators — never instantiate them directly.
 
 You must pass a navigation function to `GetViewOperator` so that the operator knows how to navigate or open a view when called.
@@ -210,7 +211,7 @@ builder.Services.AddAson(
 
 - **Remote server** – Scripts execute on a remote server, either in an external process or Docker container.  
   See the next section for configuration details.
-
+![ASON Execution Environments](images/execution-environments.jpg)
 
 ## Remote execution
 
