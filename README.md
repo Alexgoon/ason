@@ -1,7 +1,8 @@
 # ASON (Agent Script Operation)
 
-**ASON** is a lightweight framework that enables AI models to execute a sequence of functions in your application.  
-Unlike traditional **MCP** or **tool-calling** mechanisms, ASON generates and executes complete scripts in a single pass — delivering greater **flexibility**, **performance**, and **efficiency**.
+**ASON** is a lightweight framework that enables AI models to execute a sequence of functions in your application. Unlike traditional **MCP** or **tool-calling** mechanisms, ASON generates and executes complete scripts in a single pass.
+
+ASON offers greater flexibility, performance, and efficiency when integrating AI into applications. For more details, refer to: [Benefits of ASON over Tool Calling / MCP](#benefits-of-ason-over-tool-calling--mcp).
 
 ## Online Demo
 
