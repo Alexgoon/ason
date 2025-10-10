@@ -17,6 +17,7 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<GenerateRuntimeConfigFile>true</GenerateRuntimeConfigFile>
 		<GenerateDepsFile>true</GenerateDepsFile>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,6 +37,7 @@
 		</Content>
 		<!-- Explicitly include the targets file in the nupkg (SDK does not auto-include arbitrary buildTransitive files inside project dir unless marked) -->
 		<None Include="buildTransitive/Ason.ExternalExecutor.targets" Pack="true" PackagePath="buildTransitive/" />
+		<None Include="icon.png" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 	<ItemGroup>
