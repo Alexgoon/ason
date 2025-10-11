@@ -43,7 +43,8 @@ However, you can also use other services supported by **Semantic Kernel** (see: 
 
 ## How ASON works
 
-Here’s a simplified overview of the ASON architecture:
+Below is a simplified overview of the ASON architecture.
+
 ![ASON Flow Overview](images/flow-overview.jpg)
 1. Your application defines **operators** that execute methods in your code.  
 2. The **ASON Client** creates APIs (operator signatures) and passes them to the **Script Agent** along with the user’s task.  
@@ -108,6 +109,7 @@ public class MainAppOperator : RootOperator<MainViewModel> {
 
 Each operator contains APIs related to a specific **view**, **module**, or **service**.  
 A parent operator can create child operators using the `OperatorBase.GetViewOperator` method.
+
 ![ASON Operators](images/operators.jpg)
 
 > [!Note]
