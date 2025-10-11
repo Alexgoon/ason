@@ -68,8 +68,7 @@ public class OrdersViewOperator : OperatorBase<OrdersViewModel> {
 }
 ```
 
-Operators are attached to objects that contain business logic.  
-These objects are stored in the `AttachedObject` property.
+Operators are attached to objects that contain business logic.  These objects are stored in the `AttachedObject` property.
 
 To attach an operator to an object, call `AttachChildOperator`:
 
