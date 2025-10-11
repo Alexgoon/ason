@@ -101,16 +101,17 @@ public class MainAppOperator : RootOperator<MainViewModel> {
 }
 ```
 
-> **Note:** You don’t need to call `AttachChildOperator` for the root operator.  
-> It’s automatically attached when you pass an object to the constructor.
-
+> [!Note]  
+> You don’t need to call `AttachChildOperator` for the root operator. It’s automatically attached when you pass an object to the constructor.
 
 ### Operator relationships
 
 Each operator contains APIs related to a specific **view**, **module**, or **service**.  
 A parent operator can create child operators using the `OperatorBase.GetViewOperator` method.
 ![ASON Operators](images/operators.jpg)
-> **Important:** Always use `GetViewOperator` to create child operators — never instantiate them directly.
+
+> [!Note]
+> Always use `GetViewOperator` to create child operators — never instantiate them directly.
 
 You must pass a navigation function to `GetViewOperator` so that the operator knows how to navigate or open a view when called.
 
@@ -213,6 +214,7 @@ builder.Services.AddAson(
 
 - **Remote server** – Scripts execute on a remote server, either in an external process or Docker container.  
   See the next section for configuration details.
+  
 ![ASON Execution Environments](images/execution-environments.jpg)
 
 ## Remote execution
@@ -316,19 +318,23 @@ This helps track generated scripts, capture errors, and monitor runtime events f
 ASON can handle more complex workflows than traditional tool-calling systems or standalone MCP servers.  
 It provides access to your model entities and can chain multiple method calls in a single AI-generated script.
 
-**Example scenario:**  
-A user asks your system to update the status of all leads created before June 2024 to *Inactive*.
+**Example scenario:**  A user asks your system to update the status of all leads created before June 2024 to *Inactive*.
 
 #### Traditional approach (MCP / Tool Calling)
 
-You would typically need to define specialized methods such as `GetLeadsBeforeDate(date)` and `UpdateLeadsStatus(leadIds, newStatus)`.  
+You would typically define specialized methods such as `GetLeadsBeforeDate(date)` and `UpdateLeadsStatus(leadIds, newStatus)`.  
 
-If a user later changes the request slightly, these methods may no longer apply — requiring you to add more methods or generalize parameters (which increases the risk of invalid LLM-generated input).
+1. The user’s request is passed to the LLM along with all available tools.  
+2. The LLM analyzes the request and available tools, then decides to call `GetLeadsBeforeDate` with a specific date as a parameter.  
+3. Your application executes the `GetLeadsBeforeDate` method.  
+4. The results are passed back to the LLM (the entire collection returned by `GetLeadsBeforeDate`).  
+5. The LLM then decides to call `UpdateLeadsStatus` using the IDs obtained from the previous step.  
+6. Your application executes the `UpdateLeadsStatus` method.  
+7. Finally, the LLM generates the text output.  
 
-```csharp
-GetLeadsBeforeDate(DateTime date);
-UpdateLeadsStatus(IEnumerable<int> leadIds, string newStatus);
-```
+If the user later modifies their request, these methods may no longer fit — requiring you to add new ones or make existing ones more generic, which increases the risk of invalid LLM-generated input. Also note that in step 4, the entire result set must be passed to the LLM so it can construct parameters for step 5.
+
+
 
 #### ASON approach
 
