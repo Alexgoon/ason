@@ -1,9 +1,11 @@
 # ASON (Agent Script Operation)
 ![ASON Logo](images/ason_logo.jpeg)
 
-**ASON** is a library that enables AI models to execute a sequence of functions in your application. Unlike traditional **MCP** or **tool-calling** mechanisms, ASON generates and executes complete scripts in a single pass.
+**ASON** is a library that enables AI models to generate scripts and execute sequences of functions in your application based on natural language user requests. Unlike traditional **MCP** or **tool-calling** mechanisms, ASON generates and runs complete scripts in a single pass.
 
-ASON offers greater flexibility, performance, and efficiency when integrating AI into applications. For more details, refer to: [Benefits of ASON over Tool Calling / MCP](#benefits-of-ason-over-tool-calling--mcp).
+This architecture makes it possible to handle multi-step data editing, analytical requests (for example, building dynamic charts from your data), or extracting information from large data sources. No complex infrastructure is required — ASON provides a simple entry point for powerful AI integration.
+
+ASON offers greater flexibility, performance, and efficiency when bringing AI into your applications. For more details, see [Benefits of ASON over Tool Calling / MCP](#benefits-of-ason-over-tool-calling--mcp).
 
 ## Online Demo
 
@@ -35,7 +37,7 @@ In the project templates, the API key is defined as follows:
 var apiKey = Environment.GetEnvironmentVariable("MY_OPEN_AI_KEY") ?? string.Empty;
 ```
 The templates use `OpenAIChatCompletionService` to connect to OpenAI.  
-However, you can also use other services supported by **Semantic Kernel** (see: *Chat Completion | Overview*).
+However, you can also use other services supported by **Semantic Kernel** (see: [Chat Completion | Overview](https://learn.microsoft.com/en-us/semantic-kernel/concepts/ai-services/chat-completion/?tabs=csharp-Google%2Cpython-AzureOpenAI%2Cjava-AzureOpenAI&pivots=programming-language-csharp)).
 
 ---
 
@@ -159,7 +161,7 @@ asonChatClient = new AsonClient(chatService, mainAppOperator, operatorLibrary, o
 
 **Constructor parameters:**
 
-- `IChatCompletionService defaultChatCompletion` — A chat completion service used by ASON agents. Supports OpenAI, Azure, Gemini, Ollama, Anthropic, and other providers supported by Semantic Kernel (*see: Chat Completion | Overview*).  
+- `IChatCompletionService defaultChatCompletion` — A chat completion service used by ASON agents. Supports OpenAI, Azure, Gemini, Ollama, Anthropic, and other providers supported by Semantic Kernel (see: [Chat Completion | Overview](https://learn.microsoft.com/en-us/semantic-kernel/concepts/ai-services/chat-completion/?tabs=csharp-Google%2Cpython-AzureOpenAI%2Cjava-AzureOpenAI&pivots=programming-language-csharp)).  
 - `RootOperator rootOperator` — An instance of your root application operator.  
 - `OperatorsLibrary operators` — A library of operators created by `OperatorBuilder`.  
 - `AsonClientOptions options` — Defines the execution environment, allows prompt overrides, custom agent configurations, and other behaviors.
@@ -259,7 +261,7 @@ ASON uses multiple internal AI agents to coordinate the workflow, generate scrip
 
 ## MCP integration
 
-ASON scripts can invoke functions from **MCP servers** using the MCP C# SDK.  
+ASON scripts can invoke functions from **MCP servers** using the [MCP C# SDK](https://github.com/modelcontextprotocol/csharp-sdk).  
 To expose MCP methods to ASON scripts, call `OperatorBuilder.AddMcp` and pass an MCP client instance.
 
 Example workflow:
@@ -319,7 +321,7 @@ A user asks your system to update the status of all leads created before June 20
 
 #### Traditional approach (MCP / Tool Calling)
 
-You would typically need to define specialized methods such as *GetLeadsBeforeDate(date)* and *UpdateLeadsStatus(leadIds, newStatus)*.  
+You would typically need to define specialized methods such as `GetLeadsBeforeDate(date)` and `UpdateLeadsStatus(leadIds, newStatus)`.  
 
 If a user later changes the request slightly, these methods may no longer apply — requiring you to add more methods or generalize parameters (which increases the risk of invalid LLM-generated input).
 
@@ -351,7 +353,7 @@ ASON understands your model (for example, `Lead`) and available operations (such
 ### Performance
 
 With traditional MCP or tool-calling systems, **each tool call triggers a separate LLM request**.  
-For example, if you expose a *DeleteOrder* method and a user asks to delete 10 orders, your client must make at least 10 LLM round trips — significantly impacting performance.
+For example, if you expose a `DeleteOrder` method and a user asks to delete 10 orders, your client must make at least 10 LLM round trips — significantly impacting performance.
 
 ASON, by contrast, generates a single script and executes it **without further LLM involvement**. 
 
