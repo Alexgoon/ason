@@ -66,12 +66,14 @@ public class OrdersViewOperator : OperatorBase<OrdersViewModel> {
     [AsonMethod]  
     public void DeleteOrder(int orderId) => AttachedObject?.DeleteOrder(orderId);  
 }
+```
 
 Operators are attached to objects that contain business logic.  
 These objects are stored in the `AttachedObject` property.
 
 To attach an operator to an object, call `AttachChildOperator`:
 
+```csharp
 public partial class OrdersViewModel {  
     public void DeleteOrder(int orderId) => Debug.WriteLine($"Deleted order {orderId}");  
     public OrdersViewModel(RootOperator rootOperator) {  
