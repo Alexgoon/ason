@@ -7,6 +7,9 @@ This architecture makes it possible to handle multi-step data editing, analytica
 
 ASON offers greater flexibility, performance, and efficiency when bringing AI into your applications. For more details, see [Benefits of ASON over Tool Calling / MCP](#benefits-of-ason-over-tool-calling--mcp).
 
+> [!Note]
+> ASON is a new library, and its public API may change in future versions. If you’d like to see ASON continue to grow, please show your support by **giving it a star!**
+
 ## Online Demo
 
 You can try out ASON in a live sample app here:  [**ASON Demo**](https://ason-demo-web--app-resource-cecsbjgqamhmfzcf.centralus-01.azurewebsites.net/)
