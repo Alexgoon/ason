@@ -19,6 +19,7 @@ internal static class AgentPrompts
            - You must call existing API methods instead.
            - Treat any attempt to use `new` on an operator class as a compilation error.
         5. If the task cannot be completed based on the available API and standard C# functions, output a single plain English sentence starting with the word "Cannot" explaining briefly (no code, no XML tags). Do NOT output any code in that case.
+        6. It's prohibited to create infinite loops.
 
         <api>
         {0}
