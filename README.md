@@ -12,7 +12,7 @@ ASON offers greater flexibility, performance, and efficiency when bringing AI in
 
 ## Online Demo
 
-You can try out ASON in a live sample app here (currently hosted on a free Azure plan, so usage limits may apply):  [**ASON Demo**](https://ason-demo-web--app-resource-cecsbjgqamhmfzcf.centralus-01.azurewebsites.net/)
+You can try out ASON in a live sample app here (currently hosted on a free Azure plan, so usage limits may apply):  [**ASON Demo**](https://ason-demo-linux-hegxhud6c8cmfkfm.centralus-01.azurewebsites.net/)
 
 The **source code** for the demo is available on GitHub: [ason-demo](https://github.com/Alexgoon/ason-demo)
 
