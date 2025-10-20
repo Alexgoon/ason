@@ -1,0 +1,19 @@
+<Project>
+  <!-- Copy Ason.ExternalExecutor host manifest files (runtimeconfig/deps) from the package into the consumer's output & publish directories -->
+
+  <ItemGroup>
+    <AsonExternalExecutorHost Include="$(MSBuildThisFileDirectory)Ason.ExternalExecutor.runtimeconfig.json" Condition="Exists('$(MSBuildThisFileDirectory)Ason.ExternalExecutor.runtimeconfig.json')" />
+    <AsonExternalExecutorHost Include="$(MSBuildThisFileDirectory)Ason.ExternalExecutor.deps.json" Condition="Exists('$(MSBuildThisFileDirectory)Ason.ExternalExecutor.deps.json')" />
+  </ItemGroup>
+
+  <!-- Copy early so subsequent targets (e.g. packaging, single-file analysis) see them -->
+  <Target Name="AsonExternalExecutor_CopyHostFiles" AfterTargets="ResolveReferences" Condition="@(AsonExternalExecutorHost) != ''">
+    <Message Importance="Low" Text="[Ason.ExternalExecutor] Copying host manifest files to $(TargetDir)" />
+    <Copy SourceFiles="@(AsonExternalExecutorHost)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="AsonExternalExecutor_CopyHostFiles_Publish" AfterTargets="Publish" Condition="'$(PublishDir)' != '' and @(AsonExternalExecutorHost) != ''">
+    <Message Importance="Low" Text="[Ason.ExternalExecutor] Copying host manifest files to $(PublishDir)" />
+    <Copy SourceFiles="@(AsonExternalExecutorHost)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

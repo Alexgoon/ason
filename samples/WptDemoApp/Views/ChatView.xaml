@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="WpfSampleApp.Views.ChatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:v="clr-namespace:WpfSampleApp.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <v:NullToVisiblityConverer x:Key="NullToVisiblityConverer" />
+        <v:NullToVisiblityConverer Invert="True" x:Key="NullToVisiblityInvertedConverer" />
+        
+    </UserControl.Resources>
+    <Grid Margin="0,0,10,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBox Text="{Binding ChatResponse}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 IsReadOnly="True"
+                 BorderThickness="0"
+                 Grid.ColumnSpan="2"
+                 Margin="0,0,0,10" />
+        <ProgressBar IsIndeterminate="True"
+                     VerticalAlignment="Bottom"
+                     Visibility="{Binding SendMessageCommand.IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     Margin="0,6"
+                     Grid.ColumnSpan="2" />
+        <Button Content="Show suggested prompts"
+                Command="{Binding ShowSuggestedPromptsCommand}"
+                Visibility="{Binding ChatResponse, Converter={StaticResource NullToVisiblityConverer}}"
+                Cursor="Hand"
+                Padding="15"
+                HorizontalAlignment="Center"
+                Margin="10,0,0,0"/>
+        <Grid VerticalAlignment="Center"
+              Visibility="{Binding ChatResponse, Converter={StaticResource NullToVisiblityInvertedConverer}}"
+              Margin="30,0,38,0"
+              Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Prompt Suggestions"
+                       HorizontalAlignment="Center"
+                       FontWeight="SemiBold" 
+                       Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding PromptSuggestions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Padding="15"
+                                    Margin="0,12"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    BorderThickness="2"
+                                    Cursor="Hand"
+                                    Command="{Binding DataContext.UsePromptCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}">
+                                <TextBlock Text="{Binding}"
+                                           TextAlignment="Justify"
+                                           TextWrapping="Wrap" />
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+        <TextBox x:Name="InputTextBox"
+                 Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 BorderThickness="1"
+                 Grid.Row="2"
+                 Margin="0,0,0,10"
+                 MinHeight="60">
+            <TextBox.InputBindings>
+                <!-- Send on Enter (without modifiers) -->
+                <KeyBinding Command="{Binding SendMessageCommand}"
+                            Key="Enter" />
+                <!-- Prevent sending when Ctrl+Enter: insert newline (default behavior) -->
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button Command="{Binding SendMessageCommand}"
+                IsDefault="True"
+                VerticalAlignment="Bottom"
+                Margin="8,0,0,10"
+                Padding="8"
+                Width="30"
+                BorderThickness="1"
+                Background="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}"
+                Grid.Row="2"
+                Grid.Column="1">
+            <Image Source="/Images/send.png" />
+        </Button>
+    </Grid>
+</UserControl>

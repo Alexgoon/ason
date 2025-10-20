@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="WpfSampleApp.Views.EmployeesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:m="clr-namespace:WpfSampleApp.Model"
+             xmlns:local="clr-namespace:WpfSampleApp.Views"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:v="clr-namespace:WpfSampleApp.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <v:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+    </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadDataCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ToolBarTray IsLocked="True"
+                     Background="White">
+            <ToolBar>
+                <Button Content="Add"
+                        Command="{Binding AddEmployeeCommand}"/>
+                <Button Content="Edit"
+                        Command="{Binding EditEmployeeCommand}" />
+                <Button Content="Delete"
+                        Command="{Binding DeleteEmployeeCommand}" />
+                <Separator />
+                <Button Content="Save &amp; Close All"
+                        Command="{Binding SaveAllCommand}" />
+            </ToolBar>
+        </ToolBarTray>
+        <DataGrid ItemsSource="{Binding Employees}"
+                  SelectedItem="{Binding SelectedEmployee}"
+                  SelectionMode="Single"
+                  IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  Background="White"
+                  Margin="0,8,0,0"
+                  Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" />
+                <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" />
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
+                <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
+                <DataGridTextColumn Header="Hire Date" Binding="{Binding HireDate, StringFormat=d}" />
+            </DataGrid.Columns>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding EditEmployeeCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </DataGrid>
+        <TabControl ItemsSource="{Binding EditedEmployeeViewModels}"
+                    SelectedItem="{Binding SelectedEditedEmployeeViewModel}"
+                    Visibility="{Binding EditedEmployeeViewModels.Count, Converter={StaticResource CountToVisibilityConverter}}"
+                    Grid.Row="2">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <Button Content="x"
+                                Command="{Binding DataContext.CloseEditorCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                BorderThickness="0"
+                                Background="Transparent"
+                                CommandParameter="{Binding}"
+                                VerticalAlignment="Top"
+                                VerticalContentAlignment="Top"
+                                DockPanel.Dock="Right"
+                                Margin="4,0,0,0"
+                                Padding="4,0" />
+                        <TextBlock Text="{Binding Editable.FirstName}" />
+                    </DockPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <v:EmployeeEditView />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        <ProgressBar IsIndeterminate="True"
+                     VerticalAlignment="Center"
+                     Width="200"
+                     Visibility="{Binding LoadDataCommand.IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     Grid.RowSpan="3" />
+    </Grid>
+</UserControl>

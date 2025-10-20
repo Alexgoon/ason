@@ -1,0 +1,49 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<style>
+    .three-lines {
+        line-height: 1.5rem; 
+        height: 4.5rem; 
+        overflow: hidden; 
+    }
+</style>
+
+<div class="d-flex flex-column align-center mt-8 mb-6">
+    <MudAvatar Icon="@Icons.Material.Filled.Edit" Size="Size.Large" Color="Color.Secondary" Class="mb-2" />
+    <MudText Typo="Typo.h4" Class="mb-1">Write For Me</MudText>
+    <MudText Typo="Typo.subtitle2" Class="mud-text-secondary mb-3">Supercharged writing assistant ⚡</MudText>
+</div>
+
+<MudGrid Class="justify-center" GutterSize="3">
+    @foreach (var prompt in _prompts)
+    {
+        <MudItem xs="12" sm="6" md="3" Style="three-lines">
+            <MudPaper Class="pa-4 rounded clickable h-100 d-flex" Elevation="1" Style="cursor:pointer; height:100%" @onclick="() => UsePrompt(prompt)">
+                <MudText Typo="Typo.body2" Class="text-truncate" Style="display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">@prompt</MudText>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private readonly string[] _prompts = new[] {
+        "Write a 1000 word essay describing the qualities of AI in modern business.",
+        "What are some little known hacks for creative writing?",
+        "Compose a business plan for my startup that offers eco-friendly packaging solutions.",
+        "Write a detailed blog post exploring tropes found in science fiction.",
+        "Summarize the last 10 employee emails into bullet points.",
+        "Create a sales report for the top 5 products this quarter.",
+        "List potential marketing taglines for a sustainable fashion brand.",
+        "Generate interview questions for a senior software engineer candidate."
+    };
+
+    [CascadingParameter] public ChatPanel? Chat { get; set; }
+
+    private async Task UsePrompt(string prompt) {
+        if (Chat is not null) {
+            await Chat.SendPromptAsync(prompt);
+        }
+    }
+}

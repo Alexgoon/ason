@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<BaseOutputPath>..\bin</BaseOutputPath>
+		<OutputType>Exe</OutputType>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
+		<Authors>Alexgoon</Authors>
+		<PackageId>Ason.ExternalExecutor</PackageId>
+		<Description>External executable host process for ASON script execution (invoked out-of-process or in Docker).</Description>
+		<RepositoryUrl>https://github.com/Alexgoon/ason</RepositoryUrl>
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<GenerateRuntimeConfigFile>true</GenerateRuntimeConfigFile>
+		<GenerateDepsFile>true</GenerateDepsFile>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.14.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+	</ItemGroup>
+
+	<!-- Package host manifest files (runtimeconfig/deps) into buildTransitive so they are not added to the consumer project tree, but available for our targets to copy next to the consuming output -->
+	<ItemGroup>
+		<Content Include="$(OutputPath)$(AssemblyName).runtimeconfig.json">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive/</PackagePath>
+		</Content>
+		<Content Include="$(OutputPath)$(AssemblyName).deps.json">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive/</PackagePath>
+		</Content>
+		<!-- Explicitly include the targets file in the nupkg (SDK does not auto-include arbitrary buildTransitive files inside project dir unless marked) -->
+		<None Include="buildTransitive/Ason.ExternalExecutor.targets" Pack="true" PackagePath="buildTransitive/" />
+		<None Include="icon.png" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Protocol\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Ason.Runner.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Ason.Runner.Core\Ason.Runner.Core.csproj" />
+	</ItemGroup>
+
+</Project>

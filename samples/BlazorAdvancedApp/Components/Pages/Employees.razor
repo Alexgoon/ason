@@ -1,0 +1,180 @@
+@page "/employees"
+@inject SessionState Session
+
+<style>
+    .employees-host {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .employees-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    /* .content-split removed after layout simplification */
+
+    .data-grid-pane { /* Grid fills remaining vertical space; let DataGrid manage its own scroll for FixedHeader */
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        /* overflow removed so MudDataGrid internal container becomes the scroll host enabling FixedHeader */
+    }
+
+    .editor-pane { /* Editor takes only needed height */
+        flex: 0 0 auto;
+        display: flex;
+        padding-top: .5rem;
+    }
+
+        .editor-pane .mud-tabs {
+            flex: 1;
+        }
+
+        .editor-pane .mud-tabpanel {
+            display: flex;
+            flex-direction: column;
+        }
+
+    .mud-table tr.selected-row > td,
+    .mud-table tr.selected-row:hover > td {
+        background-color: rgba(var(--mud-palette-primary-rgb), 0.20) !important;
+    }
+
+    .mud-table tr.selected-row.mud-selected > td {
+        background-color: rgba(var(--mud-palette-primary-rgb), 0.25) !important;
+    }
+</style>
+
+@if (!_loaded) {
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="ma-6" />
+}
+else {
+    <MudStack Spacing="2" Class="employees-host">
+        <MudText Typo="Typo.h5" GutterBottom="true">Employees</MudText>
+        <MudToolBar Dense="true">
+            <MudIconButton Icon="@Icons.Material.Outlined.Add" Color="Color.Primary" OnClick="AddEmptyEmployee" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Edit" Disabled="_selectedEmployee is null" OnClick="EditSelected" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Remove" Disabled="_selectedEmployee is null" OnClick="DeleteSelected" />
+            <MudButton Variant="Variant.Filled" Disabled="_editing.Count == 0" OnClick="SaveAndCloseAll">Save &amp; Close All</MudButton>
+        </MudToolBar>
+
+        <MudStack Class="employees-main" Spacing="0">
+            <div class="data-grid-pane">
+                <MudDataGrid T="Employee" Items="Session.Employees" Hover="true" Dense="true" @ref="_grid" FixedHeader="true" Height="100%"
+                             SelectedItem="_selectedEmployee" SelectedItemChanged="OnSelectedChanged" Filterable="true"
+                             RowClassFunc="GetRowClass">
+                    <Columns>
+                        <PropertyColumn T="Employee" TProperty="string" Property="e => e.FirstName" Title="First Name" />
+                        <PropertyColumn T="Employee" TProperty="string" Property="e => e.LastName" Title="Last Name" />
+                        <PropertyColumn T="Employee" TProperty="string" Property="e => e.Email" Title="Email" />
+                        <PropertyColumn T="Employee" TProperty="string" Property="e => e.Position" Title="Position" />
+                        <TemplateColumn T="Employee" Title="Hire Date">
+                            <CellTemplate Context="emp">@emp.Item.HireDate.ToShortDateString()</CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+            </div>
+            @if (_editing.Count > 0) {
+                <div class="editor-pane">
+                    <MudTabs Rounded="true" Elevation="1" @bind-ActivePanelIndex="_activeTabIndex" Class="d-flex flex-column w-100">
+                        @for (int i = 0; i < _editing.Count; i++) {
+                            var edit = _editing[i];
+                            <MudTabPanel Text="@edit.Editable.FirstName" Class="d-flex flex-column">
+                                <EmployeeEditorTabPanel Model="edit" OnSave="Save" OnClose="Close" />
+                            </MudTabPanel>
+                        }
+                    </MudTabs>
+                </div>
+            }
+        </MudStack>
+    </MudStack>
+}
+
+@code {
+    private MudDataGrid<Employee>? _grid;
+    private Employee? _selectedEmployee;
+    bool _loaded;
+
+    private List<EmployeeEditModel> _editing = new();
+    private int _activeTabIndex;
+
+    public List<Employee> EmployeesSnapshot => Session.Employees.ToList();
+
+    public void DeleteEmployee(int imployeeId) {
+        var existing = _editing.FirstOrDefault(e => e.Original.Id == imployeeId);
+        if (existing != null)
+            _editing.Remove(existing);
+        var actual = Session.Employees.FirstOrDefault(e => e.Id == imployeeId);
+        if (actual != null)
+            Session.Employees.Remove(actual);
+        _selectedEmployee = null;
+    }
+    public void OpenEditor(int employeeId) {
+        var emp = Session.Employees.FirstOrDefault(e => e.Id == employeeId);
+        if (emp is not null) OpenEditor(emp, false);
+        InvokeAsync(StateHasChanged);
+    }
+    public void AddEmployee(Employee? employee = null) {
+        var nextId = Session.Employees.Any() ? Session.Employees.Max(e => e.Id) + 1 : 1;
+        Employee newEmployee;
+        if (employee == null)
+            newEmployee = new Employee() { Id = nextId, HireDate = DateTime.Today };
+        else
+            newEmployee = new Employee {
+                Id = employee.Id,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Email = employee.Email,
+                HireDate = employee.HireDate,
+                Position = employee.Position
+            };
+        //Session.Employees.Add(newEmployee);
+        OpenEditor(newEmployee, isNew: true);
+        InvokeAsync(StateHasChanged);
+    }
+
+
+    protected override async Task OnInitializedAsync() {
+        await Session.EnsureSeededAsync();
+        _loaded = true;
+        Session.MainAppOperator.AttachChildOperator<EmployeesOperator>(this);
+    }
+
+    void AddEmptyEmployee() => AddEmployee(null);
+    string GetRowClass(Employee emp, int index) => emp == _selectedEmployee ? "selected-row" : string.Empty;
+    void OnRowDoubleClick(DataGridRowClickEventArgs<Employee> args) { _selectedEmployee = args.Item; EditSelected(); }
+    void OnSelectedChanged(Employee e) => _selectedEmployee = e;
+    void EditSelected() {
+        if (_selectedEmployee is null) return;
+        OpenEditor(_selectedEmployee, false);
+    }
+    void DeleteSelected() {
+        if (_selectedEmployee is null)
+            return;
+        DeleteEmployee(_selectedEmployee.Id);
+    }
+
+    void OpenEditor(Employee emp, bool isNew) {
+        if (_editing.Any(e => e.Original == emp)) {
+            _activeTabIndex = _editing.FindIndex(e => e.Original == emp); 
+            return;
+        }
+        var model = new EmployeeEditModel(emp, isNew, Session.Employees, Session.MainAppOperator);
+        _editing.Add(model);
+        _activeTabIndex = _editing.Count - 1;
+    }
+    void Save(EmployeeEditModel model) {
+        model.Apply();
+        Close(model);
+    }
+    void Close(EmployeeEditModel model) {
+        _editing.Remove(model);
+        if (_activeTabIndex >= _editing.Count) _activeTabIndex = _editing.Count - 1;
+        InvokeAsync(StateHasChanged);
+    }
+    void SaveAndCloseAll() { foreach (var m in _editing.ToList()) { m.Apply(); _editing.Remove(m); } _activeTabIndex = 0; }
+}

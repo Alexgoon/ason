@@ -1,0 +1,64 @@
+﻿@using Ason
+@inject AsonClient ChatClient
+
+<div class="chat-panel">
+    <h3>Chat</h3>
+
+    <div class="response-box">
+        @ChatResponse
+    </div>
+
+    <div class="input-row">
+        <textarea class="message-input"
+                  rows="@InputRows"
+                  placeholder="Type your message..."
+                  @bind="UserInput"
+                  @bind:event="oninput"
+                  @onkeydown="OnKeyDown"></textarea>
+
+        <button class="send-btn"
+                disabled="@IsSendDisabled"
+                @onclick="SendAsync">
+            ➤
+        </button>
+    </div>
+</div>
+
+@code {
+    private string? UserInput = @"Update the contact details for the following customers:
+- Alice Johnson:
+  Phone: +1 (212) 555-0147
+  Address: 123 Main St, New York, NY
+- Bob Smith:
+  Phone: +1 (310) 555-0923
+  Address: 456 Oak Ave, Los Angeles, CA
+- Carol Davis:
+  Phone: +1 (617) 555-3789
+  Address: 789 Pine Rd, Boston, MA";
+    private string? ChatResponse;
+
+    private bool IsSendDisabled => string.IsNullOrWhiteSpace(UserInput);
+
+    private int InputRows => Math.Clamp((UserInput?.Split('\n').Length ?? 1), 1, 10);
+
+    private async Task SendAsync() {
+        var toSend = UserInput?.Trim();
+        if (string.IsNullOrEmpty(toSend))
+            return;
+
+        string textToSend = UserInput!;
+        UserInput = string.Empty;
+
+        ChatResponse = await ChatClient.SendAsync(textToSend);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e) {
+        if (e.Key == "Enter" && !e.CtrlKey && !e.ShiftKey) {
+            if (!IsSendDisabled) {
+                await SendAsync();
+            }
+        }
+    }
+}

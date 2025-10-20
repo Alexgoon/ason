@@ -1,0 +1,56 @@
+﻿@page "/customers"
+@using Ason.BlazorServer.Template.Model
+@using Ason.BlazorServer.Template.Operators
+@using Ason.BlazorServer.Template.State
+@inject SessionState Session
+@rendermode InteractiveServer
+@implements IDisposable
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+@if (CustomersSource?.Count > 0) {
+    <ul>
+        @foreach (var c in CustomersSource) {
+            <li>@c.Id - @c.Name - @c.Email - @c.Phone - @c.Address</li>
+        }
+    </ul>
+}
+else {
+    <p>No customers.</p>
+}
+
+@code {
+    public List<Customer> CustomersSource => Session.Customers;
+
+    public void AddCustomer(Customer newCustomer) {
+        Session.Customers.Add(newCustomer);
+        StateHasChanged();
+    }
+
+    public void DeleteCustomer(int customerId) {
+        var customer = Session.Customers.FirstOrDefault(c => c.Id == customerId);
+        if (customer == null)
+            return;
+        Session.Customers.Remove(customer);
+        StateHasChanged();
+    }
+
+    public void EditCustomer(Customer updatedCustomer) {
+        var oldCustomer = Session.Customers.FirstOrDefault(c => c.Id == updatedCustomer.Id);
+        if (oldCustomer == null)
+            return;
+        var idx = Session.Customers.IndexOf(oldCustomer);
+        Session.Customers[idx] = updatedCustomer;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized() {
+        Session.MainAppOperator.AttachChildOperator<CustomersViewOperator>(this);
+    }
+
+    public void Dispose() {
+        Session.MainAppOperator.DetachChildOperator<CustomersViewOperator>();
+    }
+}

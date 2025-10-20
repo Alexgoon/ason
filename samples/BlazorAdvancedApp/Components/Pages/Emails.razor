@@ -1,0 +1,46 @@
+@page "/emails"
+@inject SessionState Session
+
+@if (!_loaded)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="ma-6" />
+}
+else
+{
+    <MudText Typo="Typo.h5" GutterBottom="true">Emails</MudText>
+    <MudGrid>
+        <MudItem xs="5">
+            <MudList T="MailItem" Dense="true" SelectedValue="_selected" SelectedValueChanged="OnSelectedChanged">
+                @foreach (var mail in Session.Emails.OrderByDescending(e=>e.ReceivedDate))
+                {
+                    <MudListItem T="MailItem" Value="@mail">
+                        <div>@mail.Subject<br /><small class="mud-text-secondary">@mail.From</small></div>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudItem>
+        <MudItem xs="7">
+            @if (_selected is not null)
+            {
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.h6">@_selected.Subject</MudText>
+                    <MudText Typo="Typo.caption" Class="mb-2">From @_selected.From on @_selected.ReceivedDate</MudText>
+                    <MudText>@_selected.Body</MudText>
+                </MudPaper>
+            }
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private MailItem? _selected;
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync() {
+        await Session.EnsureSeededAsync();
+        _selected = Session.Emails.OrderByDescending(e=>e.ReceivedDate).FirstOrDefault();
+        _loaded = true;
+    }
+
+    void OnSelectedChanged(MailItem item) { _selected = item; }
+}

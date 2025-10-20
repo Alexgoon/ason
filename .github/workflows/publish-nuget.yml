@@ -1,0 +1,82 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: Alexgoon
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}   # remove leading "v"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Build & Pack Ason.Runner.Core
+        run: |
+          dotnet build src/Ason.Runner.Core/Ason.Runner.Core.csproj --configuration Release
+          dotnet pack src/Ason.Runner.Core/Ason.Runner.Core.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Build & Pack Ason
+        run: |
+          dotnet build src/Ason/Ason.csproj --configuration Release
+          dotnet pack src/Ason/Ason.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Build & Publish Ason.ExternalExecutor
+        run: |
+          # Build the project to generate runtimeconfig.json and other runtime files
+          dotnet build src/Ason.ExternalExecutor/Ason.ExternalExecutor.csproj --configuration Release
+
+          # Publish to a temporary folder to ensure runtime files exist
+          dotnet publish src/Ason.ExternalExecutor/Ason.ExternalExecutor.csproj --configuration Release --output ./publish
+
+          # Pack the NuGet package from the published output
+          dotnet pack src/Ason.ExternalExecutor/Ason.ExternalExecutor.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkg \
+            /p:PackageVersion=${{ steps.get_version.outputs.version }} \
+            /p:IncludeBuildOutput=true
+
+      - name: Build & Pack Ason.RemoteBridge
+        run: |
+          dotnet build src/Ason.RemoteBridge/Ason.RemoteBridge.csproj --configuration Release
+          dotnet pack src/Ason.RemoteBridge/Ason.RemoteBridge.csproj --configuration Release --no-build --output ./nupkg /p:PackageVersion=${{ steps.get_version.outputs.version }}
+
+      - name: Build & Pack Ason.ProjectTemplates
+        run: |
+          dotnet restore samples/templates/Ason.ProjectTemplates.csproj
+          dotnet pack samples/templates/Ason.ProjectTemplates.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkg \
+            /p:PackageVersion=${{ steps.get_version.outputs.version }}
+            
+      - name: Show built packages
+        run: ls -l ./nupkg
+
+      - name: Publish NuGet packages
+        run: dotnet nuget push "./nupkg/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
