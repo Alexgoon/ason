@@ -16,6 +16,9 @@ You can try out ASON in a live sample app here (currently hosted on a free Azure
 
 The **source code** for the demo is available on GitHub: [ason-demo](https://github.com/Alexgoon/ason-demo)
 
+**Intro Video:** [ASON – Actionable AI in .NET Apps (Intro & Demo)](https://youtu.be/dKBkVTl3e_c?si=N0zoIE1EAnC6KoS1)  [![YouTube](https://img.shields.io/badge/Watch_on_YouTube-red?logo=youtube&logoColor=white)](https://youtu.be/dKBkVTl3e_c?si=N0zoIE1EAnC6KoS1)
+
+
 ## Quick start
 
 **1. Install ASON project templates**
