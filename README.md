@@ -7,7 +7,16 @@ This architecture makes it possible to handle multi-step data editing, analytica
 
 ASON offers greater flexibility, performance, and efficiency when bringing AI into your applications. For more details, see [Benefits of ASON over Tool Calling / MCP](#benefits-of-ason-over-tool-calling--mcp).
 
-[**ONLINE DEMO**](https://ason-demo-web--app-resource-cecsbjgqamhmfzcf.centralus-01.azurewebsites.net/)
+> [!Note]
+> ASON is a new library, and its public API may change in future versions. If you’d like to see ASON continue to grow, please show your support by **giving it a star!**
+
+## Online Demo
+
+You can try out ASON in a live sample app here (currently hosted on a free Azure plan, so usage limits may apply):  [**ASON Demo**](https://ason-demo-linux-hegxhud6c8cmfkfm.centralus-01.azurewebsites.net/)
+
+The **source code** for the demo is available on GitHub: [ason-demo](https://github.com/Alexgoon/ason-demo)
+
+**Intro Video:** [ASON – Actionable AI in .NET Apps (Intro & Demo)](https://youtu.be/dKBkVTl3e_c?si=N0zoIE1EAnC6KoS1)  [![YouTube](https://img.shields.io/badge/Watch_on_YouTube-red?logo=youtube&logoColor=white)](https://youtu.be/dKBkVTl3e_c?si=N0zoIE1EAnC6KoS1)
 
 
 ## Quick start
@@ -212,7 +221,7 @@ builder.Services.AddAson(
   Requires Docker installed locally.  
   Pull the required container before running the app:
 
-  > docker pull ghcr.io/alexgoon/ason:0.2.22
+  > docker pull ghcr.io/alexgoon/ason:0.8.0
 
 - **Remote server** – Scripts execute on a remote server, either in an external process or Docker container.  
   See the next section for configuration details.
