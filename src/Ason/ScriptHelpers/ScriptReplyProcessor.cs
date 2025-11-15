@@ -8,7 +8,6 @@ internal static class ScriptReplyProcessor
     {
         if (string.IsNullOrWhiteSpace(agentReply)) return string.Empty;
         string cleaned = StripCodeFences(agentReply);
-        cleaned = RemoveLineComments(cleaned);
         cleaned = RemoveBlockComments(cleaned);
         cleaned = StripDuplicateUsings(cleaned);
         cleaned = CollapseExcessBlankLines(cleaned);
@@ -24,15 +23,6 @@ internal static class ScriptReplyProcessor
                        .Replace("```", string.Empty, StringComparison.OrdinalIgnoreCase)
                        .Trim();
         return t;
-    }
-
-    private static string RemoveLineComments(string text) {
-        var sb = new System.Text.StringBuilder();
-        foreach (var line in text.Split('\n')) {
-            var idx = line.IndexOf("//");
-            if (idx >= 0) sb.AppendLine(line[..idx]); else sb.AppendLine(line);
-        }
-        return sb.ToString();
     }
 
     private static string RemoveBlockComments(string text) {

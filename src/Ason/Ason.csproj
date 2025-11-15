@@ -19,12 +19,12 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.45.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.45.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.7" />
-    <PackageReference Include="ModelContextProtocol.Core" Version="0.1.0-*" />
+    <PackageReference Include="ModelContextProtocol.Core" Version="0.4.0-preview.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Ason.Runner.Core\Ason.Runner.Core.csproj" />
-	<None Include="icon.png" Pack="true" PackagePath="\"/>
+	<None Include="icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
  

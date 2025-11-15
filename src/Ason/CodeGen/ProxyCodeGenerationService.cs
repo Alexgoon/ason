@@ -207,7 +207,7 @@ internal sealed class ProxyCodeGenerationService {
 
     static void AddParam(McpClientTool tool, string rawName, JsonElement schemaElem, List<string> runtimeParams, List<string> sigParams, List<string> argPairs) {
         string csType = MapJsonTypeToCSharp(schemaElem, out bool isComplexModel, tool.Name, rawName);
-        string paramName = CamelCase(rawName);
+        string paramName = "@" + CamelCase(rawName);
         runtimeParams.Add($"{csType} {paramName}");
         sigParams.Add($"{csType} {paramName}");
         if (isComplexModel) {

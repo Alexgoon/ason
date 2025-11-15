@@ -296,7 +296,7 @@ public static class ProxySerializer {
 
     private static void AddToolParam(McpClientTool tool, string rawName, JsonElement schemaElem, List<string> runtimeParams, List<string> sigParams, List<string> argPairs) {
         string csType = MapJsonTypeToCSharp(schemaElem, out bool isComplex, tool.Name, rawName);
-        string paramName = CamelCase(rawName);
+        string paramName = "@" + CamelCase(rawName);
         runtimeParams.Add($"{csType} {paramName}"); sigParams.Add($"{csType} {paramName}");
         if (isComplex) argPairs.Add($"[\"{rawName}\"] = {paramName} == null ? null : new Dictionary<string, object?>({paramName}.GetType().GetProperties().ToDictionary(pi => char.ToLowerInvariant(pi.Name[0]) + pi.Name.Substring(1), pi => (object?)pi.GetValue({paramName})))");
         else argPairs.Add($"[\"{rawName}\"] = {paramName}");
