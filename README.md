@@ -280,21 +280,15 @@ To expose MCP methods to ASON scripts, call `OperatorBuilder.AddMcp` and pass an
 Example workflow:
 
 ```csharp
-async Task CreateContext7ClientAsync() {  
-    var sharedHandler = new SocketsHttpHandler {  
-        PooledConnectionLifetime = TimeSpan.FromMinutes(2),  
-        PooledConnectionIdleTimeout = TimeSpan.FromMinutes(1)  
-    };  
+async Task<McpClient> CreateContext7ClientAsync() {
+    var httpClient = new HttpClient();
+    httpClient.DefaultRequestHeaders.Add("CONTEXT7_API_KEY", Environment.GetEnvironmentVariable("CONTEXT7_API_KEY"));
 
-    var httpClient = new HttpClient(sharedHandler);  
-    httpClient.DefaultRequestHeaders.Add("CONTEXT7_API_KEY", Environment.GetEnvironmentVariable("CONTEXT7_API_KEY"));  
-
-    var transport = new SseClientTransport(  
-        new() { Endpoint = new Uri("https://mcp.context7.com/mcp"), Name = "context7" },  
-        httpClient);  
-
-    return await McpClientFactory.CreateAsync(transport).ConfigureAwait(false);  
-}  
+    return await McpClient.CreateAsync(
+        new HttpClientTransport(new HttpClientTransportOptions {
+            Endpoint = new Uri("https://mcp.context7.com/mcp")
+        }, httpClient));
+}
 
 var context7Client = await CreateContext7ClientAsync();  
 var operatorLibrary = new OperatorBuilder()  
